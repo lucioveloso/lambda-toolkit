@@ -25,7 +25,7 @@ After you get your lambda function tested and ready to use, you can easily deplo
 #### Installing
 
 ```
-[~/] $ git clone ssh://git.amazon.com/pkg/Lambda-toolkit
+[~/] $ git clone https://github.com/lucioveloso/lambda-toolkit.git
 [~/] $ cd Lambda-toolkit
 [~/Lambda-toolkit/] $ ./lt
 ```
