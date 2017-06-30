@@ -2,6 +2,8 @@ from ConfigParser import ConfigParser
 from queue import Queue
 from ltklambdaproxy import Ltklambdaproxy
 from utils import Utils
+import logger
+
 
 class Conf:
 
@@ -9,6 +11,7 @@ class Conf:
     vars = ""
 
     def __init__(self, config_file):
+        self.log = logger.get_my_logger("conf")
         self.config_file = config_file
         self.read_config()
         self.load_variables()
@@ -29,46 +32,51 @@ class Conf:
                 par[p] = par[p].split("#", 1)[0].strip().replace("\"", "")
             self.vars = par
         else:
-            print("Failed to load the settings in the config file.")
-            exit(1)
+            self.log.critical("Failed to load the settings in the config file.")
 
     def list_config(self):
-        print("Showing lambda-toolkit configurations:")
+        self.log.info("Showing lambda-toolkit configurations:")
         if "C_DEFAULT_ROLE" in self.vars:
-            print("- Default Role: " + self.vars['C_DEFAULT_ROLE'])
-            print("-----------------")
+            self.log.info("- Default Role: " + self.vars['C_DEFAULT_ROLE'])
+            self.log.info("---------------------------------------------------")
 
+        if self.config.has_section(self.vars['C_CONFIG_SQS']):
+            if 'C_CONFIG_SQS_QUEUES' in self.vars:
+                queues = Utils.get_list_config(self, self.vars['C_CONFIG_SQS'], self.vars['C_CONFIG_SQS_QUEUES'])
+                if len(queues) != 0:
+                    self.log.info("SQS (Queues):")
+                    for q in queues:
+                        self.log.info("- Queue name: " + q)
+                    self.log.info("---------------------------------------------------")
+
+        if self.config.has_section(self.vars['C_CONFIG_LAMBDAPROXY']):
+            lbs = self.config.items(self.vars['C_CONFIG_LAMBDAPROXY'])
+            if len(lbs) != 0:
+                self.log.info("Lambda Proxies:")
+                for lb in lbs:
+                    self.log.info("- Lambda Proxy: " + lb[0] + "\t\t[SQS: " + lb[1] + "]")
+                self.log.info("---------------------------------------------------")
+
+        self.log.info("User lambda projects:")
         for s in self.config.sections():
-            if s == self.vars['C_CONFIG_SQS']:
-                if 'C_CONFIG_SQS_QUEUES' in self.vars:
-                    queues = Utils.get_list_config(self, self.vars['C_CONFIG_SQS'], self.vars['C_CONFIG_SQS_QUEUES'])
-                    if len(queues) != 0:
-                        print("SQS (Queues):")
-                        for q in queues:
-                            print("- Queue name: " + q)
-                        print("-----------------")
-            elif s == self.vars['C_CONFIG_LAMBDAPROXY']:
-                lbs = self.config.items(self.vars['C_CONFIG_LAMBDAPROXY'])
-                if len(lbs) != 0:
-                    print("Lambda Proxies:")
-                    for lb in lbs:
-                        print("- Lambda Proxy: " + lb[0] + "\t\t[SQS: " + lb[1] + "]")
-                    print("-----------------")
-            elif s == self.vars['C_CONFIG_SETTINGS']:
+            if (s == self.vars['C_CONFIG_SETTINGS'] or
+                s == self.vars['C_CONFIG_LAMBDAPROXY'] or
+                s == self.vars['C_CONFIG_SQS']):
                 pass
             else:
                 deployed = self.config.get(s, "deployed")
-                print("- User Lambda Project: " + s + "\t[Deployed: " + deployed + "]")
+                self.log.info("- User Lambda Project: " + s + "\t[Deployed: " + deployed + "]")
 
     def delete_all_config(self):
         if 'C_CONFIG_LAMBDAPROXY' in self.vars:
-            for lp in self.config.items(self.vars['C_CONFIG_LAMBDAPROXY']):
-                self.conf = Ltklambdaproxy(self, lp[0]).undeploy_lambda_proxy()
+            if self.config.has_section(self.vars['C_CONFIG_LAMBDAPROXY']):
+                for lp in self.config.items(self.vars['C_CONFIG_LAMBDAPROXY']):
+                    self.conf = Ltklambdaproxy(self, lp[0]).undeploy_lambda_proxy()
 
-        if 'C_CONFIG_SQS_QUEUES' in self.vars:
+        if 'C_CONFIG_SQS_QUEUES' in self.vars and 'C_CONFIG_SQS' in self.vars:
             queues = Utils.get_list_config(self, self.vars['C_CONFIG_SQS'],
                                            self.vars['C_CONFIG_SQS_QUEUES'])
             for q in queues:
                 self.conf = Queue(self, q).delete_queue()
 
-        print("Removed all proxies and queues.")
+        self.log.info("Removed all proxies and queues.")

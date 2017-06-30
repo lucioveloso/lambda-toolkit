@@ -1,3 +1,4 @@
+import logger
 
 
 class Utils:
@@ -18,20 +19,25 @@ class Utils:
         return []
 
     @staticmethod
+    def append_fifo_in_queue(queueName):
+        if queueName.endswith(".fifo"):
+            return queueName
+        else:
+            return queueName + ".fifo"
+
+    @staticmethod
     def validate_reserved_sections(conf, p):
         if (p == conf.vars['C_CONFIG_SQS'] or p == conf.vars['C_CONFIG_SQS_QUEUES']
            or p == conf.vars['C_CONFIG_SETTINGS']):
-            print("Reserved name: " + p)
-            exit(1)
+            logger.get_my_logger("utils").critical("Reserved name: " + p)
 
     @staticmethod
     def define_lambda_role(conf, rolename):
         if rolename == "":
             if 'C_DEFAULT_ROLE' in conf.vars:
                 rolename = conf.vars['C_DEFAULT_ROLE']
-                print("Using the default lambda role: " + rolename)
+                logger.get_my_logger("utils").info("Using the default lambda role: " + rolename)
             else:
-                print("Parameter --rolename or set a default-role is required.")
-                exit(1)
+                logger.get_my_logger("utils").critical("Parameter --rolename or set a default-role is required.")
 
         return rolename

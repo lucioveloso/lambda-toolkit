@@ -5,6 +5,9 @@ from modules.project import Project
 from modules.ltklambdaproxy import Ltklambdaproxy
 from modules.receiver import Receiver
 from modules.role import Role
+from modules.utils import Utils
+import logger
+
 
 class Gateway:
 
@@ -14,6 +17,7 @@ class Gateway:
     rolename = ""
 
     def __init__(self,action, args):
+        self.log = logger.get_my_logger("gateway")
         self.action = action
         self.get_args(args)
 
@@ -29,10 +33,7 @@ class Gateway:
             if opt in ("-p", "--projectname"):
                 self.projectname = arg
             elif opt in ("-q", "--sqsname"):
-                if arg.endswith(".fifo"):
-                    self.sqsname = arg
-                else:
-                    self.sqsname = arg + ".fifo"
+                self.sqsname = Utils.append_fifo_in_queue(arg)
             elif opt in ("-r", "--rolename"):
                 self.rolename = arg
             elif opt in ("-l", "--lambdaname"):
@@ -63,13 +64,14 @@ class Gateway:
             try:
                 Receiver(conf, self.sqsname, self.projectname).receiver()
             except KeyboardInterrupt:
-                print("Stopping the receive.")
+                self.log.info("Stopping the receive.")
         elif self.action == "set-default-role":
             Role(conf, self.rolename).set_default_role()
         elif self.action == "create-star":
+            queue_name = Utils.append_fifo_in_queue(self.projectname + "_queue")
             conf = Project(conf, self.projectname).create_project()
-            conf = Queue(conf, self.projectname + "_queue").create_queue()
-            conf = Ltklambdaproxy(conf, self.projectname + "_proxy").deploy_lambda_proxy(self.rolename, self.projectname + "_queue")
+            conf = Queue(conf, queue_name).create_queue()
+            conf = Ltklambdaproxy(conf, self.projectname + "_proxy").deploy_lambda_proxy(self.rolename, queue_name)
             return Project(conf, self.projectname).deploy_project(self.rolename)
         elif self.action == "delete-all-configuration":
             conf.delete_all_config()

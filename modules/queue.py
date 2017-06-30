@@ -1,34 +1,36 @@
 import boto3
 from utils import Utils
+import logger
 
 
 class Queue:
 
     def __init__(self, conf, sqsname):
+        self.log = logger.get_my_logger("queue")
         self.conf = conf
         if sqsname != "":
-            self.sqsname = sqsname
+            self.sqsname = Utils.append_fifo_in_queue(sqsname)
         else:
-            print("Parameter --sqsname is required.")
-            exit(1)
+            self.log.critical("Parameter --sqsname is required.")
 
     def create_queue(self):
         sqs = boto3.client('sqs')
         queues = self.list_queues()
         if self.sqsname in queues:
-            print("The queue " + self.sqsname + " already exists.")
+            self.log.critical("The queue " + self.sqsname + " already exists.")
         else:
             try:
                 sqs.create_queue(QueueName=self.sqsname, Attributes={'VisibilityTimeout': '3',
-                                                                               'FifoQueue': 'true'})
-                print("The queue '" + self.sqsname + "' has been created.")
-            except Exception as e:
-                print(str(e))
-                print("Failed to create the queue '" + self.sqsname + "'.")
+                                                                     'FifoQueue': 'true'})
+                queues.append(self.sqsname)
+                self.conf.config.set(self.conf.vars['C_CONFIG_SQS'],
+                                     self.conf.vars['C_CONFIG_SQS_QUEUES'],
+                                     ','.join(filter(None, queues)))
 
-            queues.append(self.sqsname)
-            self.conf.config.set(self.conf.vars['C_CONFIG_SQS'], self.conf.vars['C_CONFIG_SQS_QUEUES'],
-                                 ','.join(filter(None, queues)))
+                self.log.info("The queue '" + self.sqsname + "' has been created.")
+            except Exception as e:
+                self.log.error(str(e))
+                self.log.critical("Failed to create the queue '" + self.sqsname + "'.")
 
         return self.conf
 
@@ -40,17 +42,17 @@ class Queue:
             try:
                 response = sqs.get_queue_url(QueueName=self.sqsname)
                 sqs.delete_queue(QueueUrl=response['QueueUrl'])
-                print("The queue '" + self.sqsname + "' has been removed.")
+                self.log.info("The queue '" + self.sqsname + "' has been removed.")
             except Exception as e:
-                print(str(e))
-                print("Failed to remove the queue '" + self.sqsname + "'.")
+                self.log.error(str(e))
+                self.log.critical("Failed to remove the queue '" + self.sqsname + "'.")
 
             queues.remove(self.sqsname)
 
             self.conf.config.set(self.conf.vars['C_CONFIG_SQS'],
                                  self.conf.vars['C_CONFIG_SQS_QUEUES'], ','.join(filter(None, queues)))
         else:
-            print("The queue '" + self.sqsname + "' does not exist.")
+            self.log.critical("The queue '" + self.sqsname + "' does not exist.")
 
         return self.conf
 
@@ -61,6 +63,6 @@ class Queue:
         if self.conf.config.has_section(self.conf.vars['C_CONFIG_LAMBDAPROXY']):
             for proxy in self.conf.config.items(self.conf.vars['C_CONFIG_LAMBDAPROXY']):
                 if str(proxy[1]) == self.sqsname:
-                    print("Impossible to remove " + self.sqsname + "." + " The lambda-proxy '"
-                          + proxy[0] + "' is using it")
-                    exit(1)
+                    self.log.critical("Impossible to remove " + self.sqsname + "."
+                                      + " The lambda-proxy '"
+                                      + proxy[0] + "' is using it")
