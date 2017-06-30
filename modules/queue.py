@@ -17,11 +17,12 @@ class Queue:
         sqs = boto3.client('sqs')
         queues = self.list_queues()
         if self.sqsname in queues:
-            self.log.critical("The queue " + self.sqsname + " already exists.")
+            self.log.critical("The queue '" + self.sqsname + "' already exists.")
         else:
             try:
-                sqs.create_queue(QueueName=self.sqsname, Attributes={'VisibilityTimeout': '3',
-                                                                     'FifoQueue': 'true'})
+                sqs.create_queue(QueueName=self.sqsname,
+                                 Attributes={'VisibilityTimeout': '3',
+                                             'FifoQueue': 'true'})
                 queues.append(self.sqsname)
                 self.conf.config.set(self.conf.vars['C_CONFIG_SQS'],
                                      self.conf.vars['C_CONFIG_SQS_QUEUES'],
@@ -50,19 +51,22 @@ class Queue:
             queues.remove(self.sqsname)
 
             self.conf.config.set(self.conf.vars['C_CONFIG_SQS'],
-                                 self.conf.vars['C_CONFIG_SQS_QUEUES'], ','.join(filter(None, queues)))
+                                 self.conf.vars['C_CONFIG_SQS_QUEUES'],
+                                 ','.join(filter(None, queues)))
         else:
             self.log.critical("The queue '" + self.sqsname + "' does not exist.")
 
         return self.conf
 
     def list_queues(self):
-        return Utils.get_list_config(self.conf, self.conf.vars['C_CONFIG_SQS'], self.conf.vars['C_CONFIG_SQS_QUEUES'])
+        return Utils.get_list_config(self.conf,
+                                     self.conf.vars['C_CONFIG_SQS'],
+                                     self.conf.vars['C_CONFIG_SQS_QUEUES'])
 
     def verify_queue_in_use(self):
         if self.conf.config.has_section(self.conf.vars['C_CONFIG_LAMBDAPROXY']):
             for proxy in self.conf.config.items(self.conf.vars['C_CONFIG_LAMBDAPROXY']):
                 if str(proxy[1]) == self.sqsname:
-                    self.log.critical("Impossible to remove " + self.sqsname + "."
+                    self.log.critical("Impossible to remove '" + self.sqsname + "'."
                                       + " The lambda-proxy '"
                                       + proxy[0] + "' is using it")

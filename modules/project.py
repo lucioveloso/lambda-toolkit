@@ -29,8 +29,9 @@ class Project:
             self.conf.config.add_section(self.projectname)
             mkdir(self.conf.vars['C_LAMBDAS_DIR'] + self.projectname)
             open(self.conf.vars['C_LAMBDAS_DIR'] + self.projectname + "/__init__.py", 'a').close()
-            copy2(self.conf.vars['C_LAMBDASTANDARD_FUNC'], self.conf.vars['C_LAMBDAS_DIR']
-                  + self.projectname + "/index.py")
+            copy2(self.conf.vars['C_LAMBDASTANDARD_FUNC'],
+                  self.conf.vars['C_LAMBDAS_DIR'] +
+                  self.projectname + "/index.py")
             self.log.info("Project " + self.projectname + " has been created.")
             self.conf.config.set(self.projectname, "deployed", "False")
 
@@ -51,7 +52,9 @@ class Project:
             urlretrieve(lambda_function['Code']['Location'], zippath)
             zip_ref = ZipFile(zippath, 'r')
             mkdir(destfolder)
-            open(self.conf.vars['C_LAMBDAS_DIR'] + self.projectname + "/__init__.py", 'a').close()
+            open(self.conf.vars['C_LAMBDAS_DIR'] +
+                 self.projectname +
+                 "/__init__.py", 'a').close()
             zip_ref.extractall(destfolder)
             zip_ref.close()
             self.conf.config.add_section(self.projectname)
