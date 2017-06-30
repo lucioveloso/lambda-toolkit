@@ -13,6 +13,7 @@ def get_my_logger(name):
     handler.setFormatter(logging.Formatter('[%(levelname)s] %(message)s'))
 
     logger = logging.getLogger(name)
+    logger.handlers[:] = [handler]
     logger.setLevel(logging.DEBUG)
     logger.addHandler(handler)
     logger.addHandler(ShutdownHandler(level=50))
