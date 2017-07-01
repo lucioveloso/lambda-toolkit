@@ -42,6 +42,9 @@ After you get your lambda function tested and ready to use, you can easily deplo
 ```
 ![Alt text](https://s3-eu-west-1.amazonaws.com/lucio-public-bucket/lambda-tail.gif "How it works")
 
+* For debbuging, you should use the ./lt **receiver** instead **tail** (running from your IDE)
+* The tail feature interacts directly with Cloud Watch. So, you must tail only lambda functions existing in AWS.
+
 ## Usage
 
 Lambda-toolkit offers a lot of resources around your lambda environment. You can see the available commands in lambda toolkit just running the binary without arguments.
