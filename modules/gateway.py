@@ -6,6 +6,7 @@ from modules.ltklambdaproxy import Ltklambdaproxy
 from modules.receiver import Receiver
 from modules.role import Role
 from modules.utils import Utils
+from modules.tail import Tail
 import logger
 
 
@@ -64,7 +65,12 @@ class Gateway:
             try:
                 Receiver(conf, self.sqsname, self.projectname).receiver()
             except KeyboardInterrupt:
-                self.log.info("Stopping the receive.")
+                self.log.info("Stopping the receiver.")
+        elif self.action == "tail":
+            try:
+                Tail(conf, self.lambdaname).tail_log()
+            except KeyboardInterrupt:
+                self.log.info("Stopping the tail.")
         elif self.action == "set-default-role":
             Role(conf, self.rolename).set_default_role()
         elif self.action == "create-star":

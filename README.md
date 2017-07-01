@@ -6,13 +6,15 @@ The lambda-toolkit is a command line tool that helps the developers in:
 
 * Creating 
 * Developing
-* Debug (In real time with real events using Lambda-toolkit proxy)
+* Debug lambda locally (In real time with real events using Lambda-toolkit proxy)
 * Testing
 * Deploying
 
-Basically lambda-toolkit proxy make you able to run and debug your lambda functions in your own machine, even inside your IDE.
+Basically lambda-toolkit proxy make you able to run and debug your lambda functions locally in your own machine, with real events, even inside your IDE. We know how a breakpoint can be useful. =)
 
 After you get your lambda function tested and ready to use, you can easily deploy the final version to AWS.
+
+* New feature: Use lambda-toolkit "tail", to get in realtime the stdouts of any lambda function that you have.
 
 ## Getting Started
 
@@ -33,7 +35,12 @@ After you get your lambda function tested and ready to use, you can easily deplo
 ## How the Lambda-toolkit proxy works
 
 ![Alt text](https://s3-eu-west-1.amazonaws.com/lucio-public-bucket/lambda-proxy-diagram.png "How it works")
-* You can see the image in https://s3-eu-west-1.amazonaws.com/lucio-public-bucket/lambda-proxy-diagram.png if it's not available here.
+
+## How the Lambda-toolkit tail works
+```
+[~/Lambda-toolkit/] $ ./lt tail --lambdaname <lambdaname>
+```
+![Alt text](https://s3-eu-west-1.amazonaws.com/lucio-public-bucket/lambda-tail.gif "How it works")
 
 ## Usage
 
@@ -174,6 +181,14 @@ Clean up all queues and lambda-proxy from AWS Lambda toolkit and AWS environment
 
 * No argument required.
 
+###### tail
+
+Collect all the stdouts from a lambda function invocation in real time in your own console.
+
+Required arguments:
+
+* lambdaname: The lambda name that you want to collect the logs.
+
 ###### receiver
 
 Run an existing project receiving information from an existing queue. (Better to run inside any IDE, to get a rich debug experience)
@@ -198,6 +213,7 @@ Required arguments:
  * Set a default role to lambdas: ./lt set-default-role [-r] --rolename <rolename> 
  * Create star (All)              ./lt create-star [-p] --projectname <projectname> [-r] --rolename <rolename>
  * Remove all proxies and queues  ./lt delete-all-configuration
+ * Tail lambda function logs      ./lt tail [-l] --lambdaname <lambdaname>
  * Receive and Process queue:     ./lt receiver [-p] --projectname <projectname> [-q]--sqsname <queuename>
 ```
 ## To do list

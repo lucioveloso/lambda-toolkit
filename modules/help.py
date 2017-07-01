@@ -22,6 +22,7 @@ class Help:
         print("")
         print(" * Create star (All)              ./lt create-star [-p] --projectname <projectname> [-r] --rolename <rolename>")
         print(" * Remove all proxies and queues  ./lt delete-all-configuration")
+        print(" * Tail lambda function logs      ./lt tail [-l] --lambdaname <lambdaname>")
         print(" * Receive and Process queue:     ./lt receiver [-p] --projectname <projectname> [-q]"
               + "--sqsname <queuename>")
         print(msg)
