@@ -19,6 +19,7 @@ class Help:
         print(" * Undeploy a lambda project:     ./lt undeploy-project [-p] --projectname <projectname>")
         print(" * Import a lambda project:       ./lt import-project [-p] --projectname <projectname>")
         print(" * Set a default role to lambdas: ./lt set-default-role [-r] --rolename <rolename> ")
+        print(" * Delete a default role:         ./lt delete-default-role")
         print("")
         print(" * Create star (All)              ./lt create-star [-p] --projectname <projectname> [-r] --rolename <rolename>")
         print(" * Remove all proxies and queues  ./lt delete-all-configuration")

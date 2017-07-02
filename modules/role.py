@@ -19,7 +19,7 @@ class Role:
             )
             return True
         except Exception as e:
-            self.log.error(e)
+            self.log.debug(e)
             self.log.critical("The role '" + self.rolename + "' does not exist.")
 
         return False
@@ -28,3 +28,10 @@ class Role:
         if self.verify_role_exists():
             self.log.info("Role '" + self.rolename + "' is set as default now.")
             self.conf.config.set(self.conf.vars['C_CONFIG_SETTINGS'], 'C_DEFAULT_ROLE', self.rolename)
+        return self.conf
+
+    def delete_default_role(self):
+        if 'C_DEFAULT_ROLE' in self.conf.vars:
+            self.conf.config.remove_option(self.conf.vars['C_CONFIG_SETTINGS'], 'C_DEFAULT_ROLE')
+            self.log.info("Removed the role '" + self.conf.vars['C_DEFAULT_ROLE'] + "'.")
+        return self.conf

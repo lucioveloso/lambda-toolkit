@@ -22,7 +22,9 @@ class Project:
             self.log.critical("Parameter --projectname is required.")
 
     def create_project(self):
-        Utils.validate_reserved_sections(self.conf, self.projectname)
+        if Utils.validate_reserved_sections(self.conf, self.projectname):
+            logger.get_my_logger("utils").critical("Reserved name: " + self.projectname)
+
         if self.conf.config.has_section(self.projectname):
             self.log.critical("Project '" + self.projectname + "' already exists.")
         else:
@@ -116,7 +118,9 @@ class Project:
         return self.conf
 
     def delete_project(self):
-        Utils.validate_reserved_sections(self.conf, self.projectname)
+        if Utils.validate_reserved_sections(self.conf, self.projectname):
+            logger.get_my_logger("utils").critical("Reserved name: " + self.projectname)
+
         if self.conf.config.has_section(self.projectname):
             self.conf = self.undeploy_project()
             self.conf.config.remove_section(self.projectname)

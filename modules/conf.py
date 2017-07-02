@@ -2,6 +2,7 @@ from ConfigParser import ConfigParser
 from queue import Queue
 from ltklambdaproxy import Ltklambdaproxy
 from utils import Utils
+from role import Role
 import logger
 
 
@@ -57,13 +58,8 @@ class Conf:
                     self.log.info("- Lambda Proxy: " + lb[0] + "\t\t[SQS: " + lb[1] + "]")
                 self.log.info("---------------------------------------------------")
 
-        self.log.info("User lambda projects:")
         for s in self.config.sections():
-            if (s == self.vars['C_CONFIG_SETTINGS'] or
-                s == self.vars['C_CONFIG_LAMBDAPROXY'] or
-                s == self.vars['C_CONFIG_SQS']):
-                pass
-            else:
+            if not Utils.validate_reserved_sections(self, s):
                 deployed = self.config.get(s, "deployed")
                 self.log.info("- User Lambda Project: " + s + "\t[Deployed: " + deployed + "]")
 
@@ -71,12 +67,12 @@ class Conf:
         if 'C_CONFIG_LAMBDAPROXY' in self.vars:
             if self.config.has_section(self.vars['C_CONFIG_LAMBDAPROXY']):
                 for lp in self.config.items(self.vars['C_CONFIG_LAMBDAPROXY']):
-                    self.conf = Ltklambdaproxy(self, lp[0]).undeploy_lambda_proxy()
+                    self = Ltklambdaproxy(self, lp[0]).undeploy_lambda_proxy()
 
         if 'C_CONFIG_SQS_QUEUES' in self.vars and 'C_CONFIG_SQS' in self.vars:
             queues = Utils.get_list_config(self, self.vars['C_CONFIG_SQS'],
                                            self.vars['C_CONFIG_SQS_QUEUES'])
             for q in queues:
-                self.conf = Queue(self, q).delete_queue()
+                self = Queue(self, q).delete_queue()
 
-        self.log.info("Removed all proxies and queues.")
+        self = Role(self, "bypassvalidator").delete_default_role()

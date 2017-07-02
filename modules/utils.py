@@ -28,8 +28,10 @@ class Utils:
     @staticmethod
     def validate_reserved_sections(conf, p):
         if (p == conf.vars['C_CONFIG_SQS'] or p == conf.vars['C_CONFIG_SQS_QUEUES']
-           or p == conf.vars['C_CONFIG_SETTINGS']):
-            logger.get_my_logger("utils").critical("Reserved name: " + p)
+           or p == conf.vars['C_CONFIG_LAMBDAPROXY'] or p == conf.vars['C_CONFIG_SETTINGS']):
+            return True
+
+        return False
 
     @staticmethod
     def define_lambda_role(conf, rolename):

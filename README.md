@@ -170,6 +170,18 @@ Required argument:
 
 * projectname: The lambda name to be imported in from your AWS environment.
 
+###### set-default-role
+
+Create a default lambda role used to create lambda functions if a specified role name is not typed.
+
+Required argument:
+
+* rolename: The Role name ARN.
+
+###### delete-default-role
+
+Delete the default lambda role used to create lambda functions if a specified role name is not typed.
+
 ###### create-star
 
 Create in one command the Queue, the Lambda Proxy and a Lambda Project to you.
@@ -214,6 +226,7 @@ Required arguments:
  * Undeploy a lambda project:     ./lt undeploy-project [-p] --projectname <projectname>
  * Import a lambda project:       ./lt import-project [-p] --projectname <projectname>
  * Set a default role to lambdas: ./lt set-default-role [-r] --rolename <rolename> 
+ * Delete a default role:         ./lt delete-default-role
  * Create star (All)              ./lt create-star [-p] --projectname <projectname> [-r] --rolename <rolename>
  * Remove all proxies and queues  ./lt delete-all-configuration
  * Tail lambda function logs      ./lt tail [-l] --lambdaname <lambdaname>

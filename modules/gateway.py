@@ -72,7 +72,9 @@ class Gateway:
             except KeyboardInterrupt:
                 self.log.info("Stopping the tail.")
         elif self.action == "set-default-role":
-            Role(conf, self.rolename).set_default_role()
+            return Role(conf, self.rolename).set_default_role()
+        elif self.action == "delete-default-role":
+            return Role(conf, "bypassvalidator").delete_default_role()
         elif self.action == "create-star":
             queue_name = Utils.append_fifo_in_queue(self.projectname + "_queue")
             conf = Project(conf, self.projectname).create_project()
