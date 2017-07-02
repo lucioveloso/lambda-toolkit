@@ -76,6 +76,7 @@ class Gateway:
         elif self.action == "unset-default-role":
             return Role(conf, "bypassvalidator").unset_default_role()
         elif self.action == "create-star":
+            Utils.define_lambda_role(conf, self.rolename)
             queue_name = Utils.append_fifo_in_queue(self.projectname + "_queue")
             conf = Project(conf, self.projectname).create_project()
             conf = Queue(conf, queue_name).create_queue()

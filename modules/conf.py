@@ -4,6 +4,7 @@ from ltklambdaproxy import Ltklambdaproxy
 from utils import Utils
 from role import Role
 import logger
+import os
 
 
 class Conf:
@@ -13,18 +14,13 @@ class Conf:
 
     def __init__(self, config_file):
         self.log = logger.get_my_logger("conf")
-        self.config_file = config_file
+        self.config_file = os.path.join(os.path.expanduser('~'), config_file)
         self.read_config()
         self.load_variables()
 
-    def read_config(self):
-        self.config = ConfigParser()
-        self.config.optionxform = str
-        self.config.read(self.config_file)
-
     def save_config(self):
-        with open(self.config_file, 'wb') as configfile:
-            self.config.write(configfile)
+        f = open(self.config_file, "w+")
+        self.config.write(f)
 
     def load_variables(self):
         if self.config.has_section("settings"):
@@ -77,4 +73,29 @@ class Conf:
 
         self = Role(self, "bypassvalidator").unset_default_role()
 
-        self.log.info("The User Lambda Projects are not removed with this command.")
+    def read_config(self):
+        self.config = ConfigParser()
+        self.config.optionxform = str
+        if not os.path.isfile(self.config_file):
+            self.log.info("Creating a new config file: '" + self.config_file + "'")
+            open(self.config_file, 'a').close()
+            self.config.add_section("settings")
+            self.config.set("settings", "C_LAMBDAS_DIR", "\"lambdas/\"")
+            self.config.set("settings", "C_LAMBDAS_ZIP_DIR", "\".zips/\"")
+            self.config.set("settings", "C_LAMBDAPROXY_FUNC", "\"./templates/lambda-proxy/index.py\"")
+            self.config.set("settings", "C_LAMBDASTANDARD_FUNC", "\"./templates/standard-lambda/index.py\"")
+            self.config.set("settings", "C_LAMBDASTANDERD_FUNC_VAR_REPLACE", "\"TEMPLATEQUEUENAME\"")
+            self.config.set("settings", "C_CONFIG_SQS", "\"sqs\"")
+            self.config.set("settings", "C_CONFIG_SQS_QUEUES", "\"queues\"")
+            self.config.set("settings", "C_CONFIG_SETTINGS", "\"settings\"")
+            self.config.set("settings", "C_CONFIG_LAMBDAPROXY", "\"lambda-proxy\"")
+            self.config.set("settings", "C_CONFIG_DEFAULT_ROLE", "\"DEFAULT_ROLE\"")
+            self.config.set("settings", "QUEUE_GETMESSAGE_VISIBILITY_TIMEOUT", 10)
+            self.config.set("settings", "QUEUE_GETMESSAGE_WAITTIMESECONDS", 20)
+            self.config.set("settings", "QUEUE_GETMESSAGE_MAXNUMBEROFMESSAGES", 10)
+            self.config.set("settings", "QUEUE_CREATEQUEUE_VISIBILITY_TIMEOUT", 3)
+            self.config.set("settings", "C_CONFIG_TAIL_TIME_TO_SLEEP", 5)
+            self.config.set("settings", "C_CONFIG_TAIL_TIME_PREVIOUS_LOG", 300000)
+            self.save_config()
+
+        self.config.read(self.config_file)

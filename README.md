@@ -104,7 +104,7 @@ Run a receiver making your lambda project process the events in the queue
  * Undeploy a lambda project:     ./lt undeploy-project [-p] --projectname <projectname>
  * Import a lambda project:       ./lt import-project [-p] --projectname <projectname>
  * Set a default role to lambdas: ./lt set-default-role [-r] --rolename <rolename> 
- * Delete the default role:       ./lt unset-default-role
+ * Unset the default role:        ./lt unset-default-role
  * Create star (All)              ./lt create-star [-p] --projectname <projectname> [-r] --rolename <rolename>
  * Remove all proxies and queues  ./lt delete-all-configuration
  * Tail lambda function logs      ./lt tail [-l] --lambdaname <lambdaname>
@@ -192,7 +192,7 @@ Required argument:
 
 ###### set-default-role
 
-Create a default lambda role used to create lambda functions if a specified role name is not typed.
+Set a default lambda role used to create lambda functions if a specified role name is not typed.
 
 Required argument:
 
@@ -200,7 +200,7 @@ Required argument:
 
 ###### unset-default-role
 
-Delete the default lambda role used to create lambda functions if a specified role name is not typed.
+Unset the default lambda role used to create lambda functions if a specified role name is not typed.
 
 ###### create-star
 
