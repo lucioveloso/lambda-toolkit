@@ -55,7 +55,18 @@ Lambda-toolkit offers a lot of resources around your lambda environment. You can
 
 ## Using lambda-toolkit proxy
 
-You can create your resources manually (Queue, Lambda Proxy and your Lambda Project) or use the "create-star" to create using only one command.
+You can create your resources manually (Queue, Lambda Proxy and your Lambda Project) or using the "create-star" to create using only one command.
+
+#### - Creating using "create-star" (One-step)
+
+Create a default lambda role to be used in lambdas
+```
+[~/Lambda-toolkit/] $ ./lt set-default-role -r arn:aws:iam::123456789012:role/service-role/myLambdaRole 
+```
+Create the queue, deploy the lambda-proxy and create a project in one command
+```
+[~/Lambda-toolkit/] $ ./lt create-star -p myProject
+```
 
 #### - Creating manually:
 
@@ -80,15 +91,24 @@ Run a receiver making your lambda project process the events in the queue
 [~/Lambda-toolkit/] $ ./lt receiver -p myLambdaProject -q testQueue
 ```
 
-#### - Creating using "create-star" (One-step)
-
-Create a default lambda role to be used in lambdas
+## Default help
 ```
-[~/Lambda-toolkit/] $ ./lt set-default-role -r arn:aws:iam::123456789012:role/service-role/myLambdaRole 
-```
-Create the queue, deploy the lambda-proxy and create a project in one command
-```
-[~/Lambda-toolkit/] $ ./lt create-star -p myProject
+ * List projects:                 ./lt list
+ * Add SQS:                       ./lt create-sqs [-q] --sqsname <queuename>
+ * Delete SQS:                    ./lt delete-sqs [-q] --sqsname <queuename>
+ * Deploy Lambda Proxy:           ./lt deploy-lambda-proxy [-l] --lambdaname <lambdaname> [-q] --sqsname <queuename> [-r] --rolename <rolename>
+ * Undeploy Lambda proxy:         ./lt undeploy-lambda-proxy [-l] --lambdaname <lambdaname>
+ * Create a new lambda project:   ./lt create-project [-p] --projectname <projectname>
+ * Delete a lambda project:       ./lt delete-project [-p] --projectname <projectname>
+ * Deploy a lambda project:       ./lt deploy-project [-p] --projectname <projectname>[-r] --rolename <rolename>
+ * Undeploy a lambda project:     ./lt undeploy-project [-p] --projectname <projectname>
+ * Import a lambda project:       ./lt import-project [-p] --projectname <projectname>
+ * Set a default role to lambdas: ./lt set-default-role [-r] --rolename <rolename> 
+ * Delete the default role:       ./lt unset-default-role
+ * Create star (All)              ./lt create-star [-p] --projectname <projectname> [-r] --rolename <rolename>
+ * Remove all proxies and queues  ./lt delete-all-configuration
+ * Tail lambda function logs      ./lt tail [-l] --lambdaname <lambdaname>
+ * Receive and Process queue:     ./lt receiver [-p] --projectname <projectname> [-q]--sqsname <queuename>
 ```
 
 ## Availables commands
@@ -178,7 +198,7 @@ Required argument:
 
 * rolename: The Role name ARN.
 
-###### delete-default-role
+###### unset-default-role
 
 Delete the default lambda role used to create lambda functions if a specified role name is not typed.
 
@@ -213,25 +233,6 @@ Required arguments:
 * projectname: The name of project that will be invoked to process an event collected in the queue.
 * queuename: The queue to get the events.
 
-## Default help
-```
- * List projects:                 ./lt list
- * Add SQS:                       ./lt create-sqs [-q] --sqsname <queuename>
- * Delete SQS:                    ./lt delete-sqs [-q] --sqsname <queuename>
- * Deploy Lambda Proxy:           ./lt deploy-lambda-proxy [-l] --lambdaname <lambdaname> [-q] --sqsname <queuename> [-r] --rolename <rolename>
- * Undeploy Lambda proxy:         ./lt undeploy-lambda-proxy [-l] --lambdaname <lambdaname>
- * Create a new lambda project:   ./lt create-project [-p] --projectname <projectname>
- * Delete a lambda project:       ./lt delete-project [-p] --projectname <projectname>
- * Deploy a lambda project:       ./lt deploy-project [-p] --projectname <projectname>[-r] --rolename <rolename>
- * Undeploy a lambda project:     ./lt undeploy-project [-p] --projectname <projectname>
- * Import a lambda project:       ./lt import-project [-p] --projectname <projectname>
- * Set a default role to lambdas: ./lt set-default-role [-r] --rolename <rolename> 
- * Delete a default role:         ./lt delete-default-role
- * Create star (All)              ./lt create-star [-p] --projectname <projectname> [-r] --rolename <rolename>
- * Remove all proxies and queues  ./lt delete-all-configuration
- * Tail lambda function logs      ./lt tail [-l] --lambdaname <lambdaname>
- * Receive and Process queue:     ./lt receiver [-p] --projectname <projectname> [-q]--sqsname <queuename>
-```
 ## To do list
 
 * Create the receiver in others languages (NodeJS, Java...) - Maybe put even the python receiver in a different file.

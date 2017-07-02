@@ -30,8 +30,8 @@ class Role:
             self.conf.config.set(self.conf.vars['C_CONFIG_SETTINGS'], 'C_DEFAULT_ROLE', self.rolename)
         return self.conf
 
-    def delete_default_role(self):
+    def unset_default_role(self):
         if 'C_DEFAULT_ROLE' in self.conf.vars:
             self.conf.config.remove_option(self.conf.vars['C_CONFIG_SETTINGS'], 'C_DEFAULT_ROLE')
-            self.log.info("Removed the role '" + self.conf.vars['C_DEFAULT_ROLE'] + "'.")
+            self.log.info("Unset the default role '" + self.conf.vars['C_DEFAULT_ROLE'] + "'.")
         return self.conf

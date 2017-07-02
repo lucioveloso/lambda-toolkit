@@ -75,4 +75,6 @@ class Conf:
             for q in queues:
                 self = Queue(self, q).delete_queue()
 
-        self = Role(self, "bypassvalidator").delete_default_role()
+        self = Role(self, "bypassvalidator").unset_default_role()
+
+        self.log.info("The User Lambda Projects are not removed with this command.")
