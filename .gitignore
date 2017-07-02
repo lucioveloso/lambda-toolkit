@@ -10,7 +10,7 @@ __pycache__/
 *.so
 
 # macOS
-.DS_Store
+*.DS_Store
 
 # Distribution / packaging
 .Python

@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+
+
 import sys
 import os
 from modules.conf import Conf
@@ -7,7 +9,6 @@ from modules.gateway import Gateway
 
 sys.dont_write_bytecode = True
 
-__version__ = '0.1-setup'
 
 if __name__ == "__main__":
     if len(sys.argv) == 1:
