@@ -16,25 +16,31 @@ class Tail:
 
     def tail_log(self):
         client = boto3.client('logs')
-        current_time = int(time.time() * 1000) - 300000
+        current_time = int(time.time() * 1000) - int(self.conf.vars['C_CONFIG_TAIL_TIME_PREVIOUS_LOG'])
 
-        print ("Collecting logs in real time, starting from " + str(300000 / 1000 / 60) + " minutes ago")
+        print ("Collecting logs in real time, starting from " + str(int(self.conf.vars['C_CONFIG_TAIL_TIME_PREVIOUS_LOG']) / 1000 / 60) + " minutes ago")
+        logGroupName = "/aws/lambda/" + self.lambdaname
         while True:
-            paginator = client.get_paginator('describe_log_streams')
-            for page in paginator.paginate(logGroupName='/aws/lambda/' + self.lambdaname):
-                for stream in page.get('logStreams', []):
-                    response = client.get_log_events(logGroupName='/aws/lambda/' + self.lambdaname,
-                                                     logStreamName=stream['logStreamName'],
-                                                     startTime=current_time)
-                    new_current_time = int(time.time() * 1000)
-                    if len(response['events']) > 0:
-                        if str(response['events'][len(response['events']) - 1]['message']).startswith('REPORT RequestId:'):
-                            for event in response['events']:
-                                print event['message'].rstrip()
+            try:
+                paginator = client.get_paginator('describe_log_streams')
+                for page in paginator.paginate(logGroupName=logGroupName):
+                    for stream in page.get('logStreams', []):
+                        response = client.get_log_events(logGroupName=logGroupName,
+                                                         logStreamName=stream['logStreamName'],
+                                                         startTime=current_time)
+                        new_current_time = int(time.time() * 1000)
+                        if len(response['events']) > 0:
+                            if str(response['events'][len(response['events']) - 1]['message']).startswith('REPORT RequestId:'):
+                                for event in response['events']:
+                                    print event['message'].rstrip()
 
-                            print("*************")
+                                print("*************")
 
 
 
-                            current_time = new_current_time
-            time.sleep(5)
+                                current_time = new_current_time
+            except Exception as e:
+                self.log.debug(e)
+                self.log.critical("Failed to load the logGroupName '" + logGroupName + "'." )
+
+            time.sleep(int(self.conf.vars['C_CONFIG_TAIL_TIME_TO_SLEEP']))
