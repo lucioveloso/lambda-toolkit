@@ -2,7 +2,6 @@
 
 
 import sys
-import os
 from modules.conf import Conf
 from modules.help import Help
 from modules.gateway import Gateway
