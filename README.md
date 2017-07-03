@@ -27,19 +27,15 @@ http://recordit.co/hyYc2jKeJd
 <a href="http://recordit.co/hyYc2jKeJd" rel="Video demo">![How it works](https://s3-eu-west-1.amazonaws.com/lucio-public-bucket/debugging-lambda.jpg)</a>
 #### Prerequisites
 
-* Python 2.7 (hopefully with `pip install virtualenv`)
+* Python 2.7
 * Git client
 * AWS account configured in your user profile
 
 #### Installing
 
 ```
-[~/] $ git clone https://github.com/lucioveloso/lambda-toolkit.git
-[~/] $ cd lambda-toolkit
-[~/lambda-toolkit/] $ virtualenv env
-[~/lambda-toolkit/] $ source env/bin/activate
-[~/lambda-toolkit/] $ pip install -r requirements.txt
-[~/lambda-toolkit/] $ python lt
+[~/] $ pip install lambda-toolkit
+```
 
 ## How the Lambda-toolkit proxy works
 
@@ -59,7 +55,7 @@ http://recordit.co/hyYc2jKeJd
 lambda-toolkit offers a lot of resources around your lambda environment. You can see the available commands in lambda toolkit just running the binary without arguments.
 
 ```
-[~/lambda-toolkit/] $ lt
+[~/] $ lt
 ```
 
 ## Using lambda-toolkit proxy
@@ -70,34 +66,34 @@ You can create your resources manually (Queue, Lambda Proxy and your Lambda Proj
 
 Create a default lambda role to be used in lambdas
 ```
-[~/Lambda-toolkit/] $ lt set-default-role -r arn:aws:iam::123456789012:role/service-role/myLambdaRole
+[~/] $ lt set-default-role -r arn:aws:iam::123456789012:role/service-role/myLambdaRole
 ```
 Create the queue, deploy the lambda-proxy and create a project in one command
 ```
-[~/Lambda-toolkit/] $ lt create-star -p myProject
+[~/] $ lt create-star -p myProject
 ```
 
 #### - Creating manually:
 
 Create a default lambda role to be used in lambdas
 ```
-[~/lambda-toolkit/] $ lt set-default-role -r arn:aws:iam::123456789012:role/service-role/myLambdaRole
+[~/] $ lt set-default-role -r arn:aws:iam::123456789012:role/service-role/myLambdaRole
 ```
 Create a queue to store the events
 ```
-[~/Lambda-toolkit/] $ lt create-sqs testQueue
+[~/] $ lt create-sqs testQueue
 ```
 Deploy a lambda-proxy to forward the events to the queue
 ```
-[~/Lambda-toolkit/] $ lt deploy-lambda-proxy -l testLambdaProxy -q testQueue
+[~/] $ lt deploy-lambda-proxy -l testLambdaProxy -q testQueue
 ```
 Create a project to start to code your lambda function
 ```
-[~/Lambda-toolkit/] $ lt create-project -p myLambdaProject
+[~/] $ lt create-project -p myLambdaProject
 ```
 Run a receiver making your lambda project process the events in the queue
 ```
-[~/Lambda-toolkit/] $ lt receiver -p myLambdaProject -q testQueue
+[~/] $ lt receiver -p myLambdaProject -q testQueue
 ```
 
 ## Default help
