@@ -18,6 +18,13 @@ After you get your lambda function tested and ready to use, you can easily deplo
 
 ## Getting Started
 
+#### Video Demo - Get started in 5 minutes
+
+Watch this video an learn how is easy to setup lambda-toolkit and start to debug real events in your IDE.
+
+http://recordit.co/hyYc2jKeJd
+
+<a href="http://recordit.co/hyYc2jKeJd" rel="Video demo">![How it works](https://s3-eu-west-1.amazonaws.com/lucio-public-bucket/debugging-lambda.jpg)</a>
 #### Prerequisites
 
 * Python 2.7
