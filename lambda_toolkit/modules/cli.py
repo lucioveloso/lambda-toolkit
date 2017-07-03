@@ -11,12 +11,12 @@ class CLI:
 
     def __init__(self):
         self.log = logger.get_my_logger("CLI")
-        self.log.info("Initializing CLI")
+        self.log.info("Initializing lambda-toolkit CLI")
 
     def main(self):
         if len(sys.argv) == 1:
             Help.print_help("")
 
-        conf = Conf("../.lambda-toolkit.cfg")
+        conf = Conf(".lambda-toolkit.cfg")
         gw = Gateway(sys.argv[1], sys.argv[2:])
         gw.do_action(conf).save_config()
