@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 from ConfigParser import ConfigParser
 from queue import Queue
 from ltklambdaproxy import Ltklambdaproxy

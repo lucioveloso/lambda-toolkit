@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import boto3
 from os import mkdir
 from os import getcwd

@@ -26,7 +26,7 @@ requires = ['boto3>=1.4.4',
 
 setup_options = dict(
     name='lambda-toolkit',
-    version=find_version("lt", "__init__.py"),
+    version=find_version("lambda_toolkit", "__init__.py"),
     description='An AWS Lambda command line interface (CLI). It helps you in creating, building, testing and deploying your lambda functions.',
     long_description=open('README.md').read(),
     author='Lucio Veloso Guimaraes',

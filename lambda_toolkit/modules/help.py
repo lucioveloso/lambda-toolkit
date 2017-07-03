@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+
+
 class Help:
 
     def __init__(self):

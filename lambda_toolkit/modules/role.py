@@ -1,6 +1,9 @@
+#!/usr/bin/env python
+
 import logger
 import boto3
 import logger
+
 
 class Role:
     def __init__(self, conf, rolename):

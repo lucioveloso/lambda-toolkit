@@ -1,12 +1,14 @@
+#!/usr/bin/env python
+
 import getopt
 from help import Help
-from modules.queue import Queue
-from modules.project import Project
-from modules.ltklambdaproxy import Ltklambdaproxy
-from modules.receiver import Receiver
-from modules.role import Role
-from modules.utils import Utils
-from modules.tail import Tail
+from queue import Queue
+from project import Project
+from ltklambdaproxy import Ltklambdaproxy
+from receiver import Receiver
+from role import Role
+from utils import Utils
+from tail import Tail
 import logger
 
 
@@ -88,4 +90,3 @@ class Gateway:
             Help.print_help("Invalid command")
 
         return conf
-
