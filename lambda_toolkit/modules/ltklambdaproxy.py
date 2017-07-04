@@ -4,8 +4,7 @@ import boto3
 from utils import Utils
 from shutil import rmtree
 from shutil import make_archive
-from os import mkdir
-from os import remove
+import os
 import logger
 
 
@@ -19,13 +18,21 @@ class Ltklambdaproxy:
         else:
             self.log.critical("Parameter --lambdaname are required.")
 
+        self.base_dir = os.path.join(os.path.expanduser('~'), self.conf.vars['C_BASE_DIR'])
+        self.lambdas_dir = os.path.join(self.base_dir, self.conf.vars['C_LAMBDAS_DIR'])
+        self.lambdaproxy_dir = os.path.join(self.lambdas_dir, self.lambdaname)
+        self.lambdaproxy_zip_dir = os.path.join(self.lambdas_dir, self.conf.vars['C_LAMBDAS_ZIP_DIR'])
+        self.lambdaproxy_zip_file = os.path.join(self.lambdaproxy_zip_dir, self.lambdaname + ".zip")
+        self.lambdaproxy_zip_file_without_ext = os.path.join(self.lambdaproxy_zip_dir, self.lambdaname)
+
     def deploy_lambda_proxy(self, rolename, sqsname):
         rolename = Utils.define_lambda_role(self.conf, rolename)
         if sqsname == "":
             self.log.critical("Parameter --sqsname are required.")
 
-        if sqsname not in Utils.get_list_config(self.conf, self.conf.vars['C_CONFIG_SQS'],
-                                                     self.conf.vars['C_CONFIG_SQS_QUEUES']):
+        if sqsname not in Utils.get_list_config(self.conf,
+                                                self.conf.vars['C_CONFIG_SQS'],
+                                                self.conf.vars['C_CONFIG_SQS_QUEUES']):
             self.log.critical("The queue " + sqsname + " does not exist.")
 
         if not self.conf.config.has_section(self.conf.vars['C_CONFIG_LAMBDAPROXY']):
@@ -34,18 +41,16 @@ class Ltklambdaproxy:
             if self.conf.config.has_option(self.conf.vars['C_CONFIG_LAMBDAPROXY'], self.lambdaname):
                 self.log.critical("Lambda proxy " + self.lambdaname + " already exists")
 
-        lambdafolder = self.conf.vars['C_LAMBDAS_DIR'] + self.lambdaname + "/"
-
-        mkdir(lambdafolder)
+        os.mkdir(self.lambdaproxy_dir)
 
         f1 = open(self.conf.vars['C_LAMBDAPROXY_FUNC'], "r")
-        f2 = open(lambdafolder + "index.py", "w")
+        f2 = open(os.path.join(self.lambdaproxy_dir, "index.py"), "w")
         for line in f1:
             f2.write(line.replace(self.conf.vars['C_LAMBDASTANDERD_FUNC_VAR_REPLACE'], sqsname))
         f1.close()
         f2.close()
-        make_archive(self.conf.vars['C_LAMBDAS_DIR'] + self.conf.vars['C_LAMBDAS_ZIP_DIR']
-                     + self.lambdaname, "zip", lambdafolder)
+
+        make_archive(self.lambdaproxy_zip_file_without_ext, "zip", self.lambdaproxy_dir)
 
         lbs = boto3.client('lambda')
 
@@ -57,8 +62,7 @@ class Ltklambdaproxy:
                 Handler='index.lambda_handler',
                 Description="Proxy lambda function " + self.lambdaname + "proxying requests to " + sqsname,
                 Code={
-                    'ZipFile': open(self.conf.vars['C_LAMBDAS_DIR'] + self.conf.vars['C_LAMBDAS_ZIP_DIR']
-                                    + self.lambdaname + ".zip", "rb").read()
+                    'ZipFile': open(self.lambdaproxy_zip_file, "rb").read()
                 }
             )
             self.log.info("Lambda proxy " + self.lambdaname + " created proxying requests to " + sqsname)
@@ -68,7 +72,7 @@ class Ltklambdaproxy:
             self.log.error(str(e))
             self.log.critical("Failed to create the lambda function")
 
-        rmtree(lambdafolder)
+        rmtree(self.lambdaproxy_dir)
 
         return self.conf
 
@@ -80,7 +84,7 @@ class Ltklambdaproxy:
                 try:
                     lbs.delete_function(FunctionName=self.lambdaname)
                     self.log.info("Lambda proxy " + self.lambdaname + " has been removed.")
-                    remove(self.conf.vars['C_LAMBDAS_DIR'] + self.conf.vars['C_LAMBDAS_ZIP_DIR'] + self.lambdaname + ".zip")
+                    os.remove(self.lambdaproxy_zip_file)
                 except Exception as e:
                     self.log.error(str(e))
                     self.log.error("Failed to delete the lambda proxy.")

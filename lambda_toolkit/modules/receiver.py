@@ -6,7 +6,7 @@ import sys
 from collections import namedtuple
 from utils import Utils
 import logger
-
+import os
 
 class Receiver:
 
@@ -28,7 +28,10 @@ class Receiver:
         sqs = boto3.resource('sqs')
         queue = sqs.get_queue_by_name(QueueName=self.sqsname)
         self.log.info("Importing project " + self.projectname)
-        lambdas = __import__("lambdas." + self.projectname + ".index")
+        pp = os.path.expanduser('~') + "/" + self.conf.vars['C_BASE_DIR'] + "lambdas"
+        sys.path.append(pp)
+        lambdas = __import__(self.projectname + ".index")
+
         self.log.info("Starting the receiver using the queue " + self.sqsname)
         while True:
             sys.stdout.write(".")
@@ -41,8 +44,8 @@ class Receiver:
                 jsonmsg = json.loads(msg.body)
                 self.log.info("=======================================")
                 self.log.info("* New message. Sending to " + self.projectname)
-
-                func = getattr(getattr(getattr(lambdas, self.projectname), "index"), "lambda_handler")
+                func = getattr(getattr(lambdas, "index"), "lambda_handler")
+                #func = getattr(getattr(getattr(lambdas, self.projectname), "index"), "lambda_handler")
 
                 if func(jsonmsg["event"], json.loads(json.dumps(jsonmsg["context"]),
                                                      object_hook=lambda d: namedtuple('X', d.keys())(*d.values()))):
