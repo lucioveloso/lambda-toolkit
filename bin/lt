@@ -1,0 +1,14 @@
+#!/usr/bin/env python
+
+
+import sys
+import os
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+if os.environ.get('LC_CTYPE', '') == 'UTF-8':
+    os.environ['LC_CTYPE'] = 'en_US.UTF-8'
+
+if __name__ == '__main__':
+    from lambda_toolkit.modules.cli import CLI
+    sys.exit(CLI().main())

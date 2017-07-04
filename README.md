@@ -1,10 +1,10 @@
 # lambda-toolkit
 
-Welcome to lambda-toolkit. 
+Welcome to lambda-toolkit.
 
-The lambda-toolkit is a command line tool that helps the developers in: 
+The lambda-toolkit is a command line tool that helps the developers in:
 
-* Creating 
+* Creating
 * Developing
 * Debug lambda locally (In real time with real events using Lambda-toolkit proxy)
 * Testing
@@ -34,9 +34,7 @@ http://recordit.co/hyYc2jKeJd
 #### Installing
 
 ```
-[~/] $ git clone https://github.com/lucioveloso/lambda-toolkit.git
-[~/] $ cd Lambda-toolkit
-[~/Lambda-toolkit/] $ ./lt
+[~/] $ pip install lambda-toolkit
 ```
 
 ## How the Lambda-toolkit proxy works
@@ -45,19 +43,19 @@ http://recordit.co/hyYc2jKeJd
 
 ## How the Lambda-toolkit tail works
 ```
-[~/Lambda-toolkit/] $ ./lt tail --lambdaname <lambdaname>
+[~/lambda-toolkit/] $ lt tail --lambdaname <lambdaname>
 ```
 ![Alt text](https://s3-eu-west-1.amazonaws.com/lucio-public-bucket/lambda-tail.gif "How it works")
 
-* For debbuging, you should use the ./lt **receiver** instead **tail** (running from your IDE)
+* For debbuging, you should use the `lt` **receiver** instead **tail** (running from your IDE)
 * The tail feature interacts directly with Cloud Watch. So, you must tail only lambda functions existing in AWS.
 
 ## Usage
 
-Lambda-toolkit offers a lot of resources around your lambda environment. You can see the available commands in lambda toolkit just running the binary without arguments.
+lambda-toolkit offers a lot of resources around your lambda environment. You can see the available commands in lambda toolkit just running the binary without arguments.
 
 ```
-[~/Lambda-toolkit/] $ ./lt
+[~/] $ lt
 ```
 
 ## Using lambda-toolkit proxy
@@ -68,54 +66,56 @@ You can create your resources manually (Queue, Lambda Proxy and your Lambda Proj
 
 Create a default lambda role to be used in lambdas
 ```
-[~/Lambda-toolkit/] $ ./lt set-default-role -r arn:aws:iam::123456789012:role/service-role/myLambdaRole 
+[~/] $ lt set-default-role -r arn:aws:iam::123456789012:role/service-role/myLambdaRole
 ```
 Create the queue, deploy the lambda-proxy and create a project in one command
 ```
-[~/Lambda-toolkit/] $ ./lt create-star -p myProject
+[~/] $ lt create-star -p myProject
 ```
 
 #### - Creating manually:
 
 Create a default lambda role to be used in lambdas
 ```
-[~/Lambda-toolkit/] $ ./lt set-default-role -r arn:aws:iam::123456789012:role/service-role/myLambdaRole 
+[~/] $ lt set-default-role -r arn:aws:iam::123456789012:role/service-role/myLambdaRole
 ```
 Create a queue to store the events
 ```
-[~/Lambda-toolkit/] $ ./lt create-sqs testQueue 
+[~/] $ lt create-sqs testQueue
 ```
 Deploy a lambda-proxy to forward the events to the queue
 ```
-[~/Lambda-toolkit/] $ ./lt deploy-lambda-proxy -l testLambdaProxy -q testQueue
+[~/] $ lt deploy-lambda-proxy -l testLambdaProxy -q testQueue
 ```
 Create a project to start to code your lambda function
 ```
-[~/Lambda-toolkit/] $ ./lt create-project -p myLambdaProject
+[~/] $ lt create-project -p myLambdaProject
 ```
 Run a receiver making your lambda project process the events in the queue
 ```
-[~/Lambda-toolkit/] $ ./lt receiver -p myLambdaProject -q testQueue
+[~/] $ lt receiver -p myLambdaProject -q testQueue
 ```
 
 ## Default help
 ```
- * List projects:                 ./lt list
- * Add SQS:                       ./lt create-sqs [-q] --sqsname <queuename>
- * Delete SQS:                    ./lt delete-sqs [-q] --sqsname <queuename>
- * Deploy Lambda Proxy:           ./lt deploy-lambda-proxy [-l] --lambdaname <lambdaname> [-q] --sqsname <queuename> [-r] --rolename <rolename>
- * Undeploy Lambda proxy:         ./lt undeploy-lambda-proxy [-l] --lambdaname <lambdaname>
- * Create a new lambda project:   ./lt create-project [-p] --projectname <projectname>
- * Delete a lambda project:       ./lt delete-project [-p] --projectname <projectname>
- * Deploy a lambda project:       ./lt deploy-project [-p] --projectname <projectname>[-r] --rolename <rolename>
- * Undeploy a lambda project:     ./lt undeploy-project [-p] --projectname <projectname>
- * Import a lambda project:       ./lt import-project [-p] --projectname <projectname>
- * Set a default role to lambdas: ./lt set-default-role [-r] --rolename <rolename> 
- * Unset the default role:        ./lt unset-default-role
- * Create star (All)              ./lt create-star [-p] --projectname <projectname> [-r] --rolename <rolename>
- * Remove all proxies and queues  ./lt delete-all-configuration
- * Tail lambda function logs      ./lt tail [-l] --lambdaname <lambdaname>
- * Receive and Process queue:     ./lt receiver [-p] --projectname <projectname> [-q]--sqsname <queuename>
+ * List projects:                 lt list
+ * Add SQS:                       lt create-sqs [-q] --sqsname <queuename>
+ * Delete SQS:                    lt delete-sqs [-q] --sqsname <queuename>
+ * Deploy Lambda Proxy:           lt deploy-lambda-proxy [-l] --lambdaname <lambdaname> [-q] --sqsname <queuename> [-r] --rolename <rolename>
+ * Undeploy Lambda proxy:         lt undeploy-lambda-proxy [-l] --lambdaname <lambdaname>
+ * Create a new lambda project:   lt create-project [-p] --projectname <projectname>
+ * Delete a lambda project:       lt delete-project [-p] --projectname <projectname>
+ * Deploy a lambda project:       lt deploy-project [-p] --projectname <projectname>[-r] --rolename <rolename>
+ * Undeploy a lambda project:     lt undeploy-project [-p] --projectname <projectname>
+ * Import a lambda project:       lt import-project [-p] --projectname <projectname>
+ * Set a default role to lambdas: lt set-default-role [-r] --rolename <rolename>
+ * Unset the default role:        lt unset-default-role
+ * Set a default role to lambdas: lt set-default-role [-r] --rolename <rolename>
+ * Delete the default role:       lt unset-default-role
+ * Create star (All)              lt create-star [-p] --projectname <projectname> [-r] --rolename <rolename>
+ * Remove all proxies and queues  lt delete-all-configuration
+ * Tail lambda function logs      lt tail [-l] --lambdaname <lambdaname>
+ * Receive and Process queue:     lt receiver [-p] --projectname <projectname> [-q]--sqsname <queuename>
 ```
 
 ## Availables commands

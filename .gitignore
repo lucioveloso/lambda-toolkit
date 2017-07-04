@@ -10,12 +10,13 @@ __pycache__/
 *.so
 
 # macOS
-.DS_Store
+*.DS_Store
 
 # Distribution / packaging
 .Python
 env/
 build/
+build_env/
 develop-eggs/
 dist/
 downloads/
