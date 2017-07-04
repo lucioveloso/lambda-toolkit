@@ -247,4 +247,5 @@ Required arguments:
 
 ## Authors
 
-* **Lucio Veloso Guimaraes** - *Initial work*
+* **Lucio Veloso Guimaraes** - *Initial work / Contributor*
+* **Gustavo Veloso** - *Contributor*
