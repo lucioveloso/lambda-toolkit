@@ -9,7 +9,8 @@ from utils import Utils
 from zipfile import ZipFile
 from urllib import urlretrieve
 import logger
-
+import pkgutil
+import sys
 
 class Project:
 
@@ -22,6 +23,7 @@ class Project:
             self.log.critical("Parameter --projectname is required.")
 
         self.base_dir = os.path.join(os.path.expanduser('~'), self.conf.vars['C_BASE_DIR'])
+        self.log.info("Base dir: " + self.base_dir)
         self.lambdas_dir = os.path.join(self.base_dir, self.conf.vars['C_LAMBDAS_DIR'])
         self.project_dir = os.path.join(self.lambdas_dir, self.projectname)
         self.project_zip_dir = os.path.join(self.lambdas_dir, self.conf.vars['C_LAMBDAS_ZIP_DIR'])
@@ -37,8 +39,9 @@ class Project:
         else:
             self.create_project_folders()
             open(self.project_dir + "/__init__.py", 'a').close()
-            # TODO: This C_LAMBDASTANDARD_FUNC should be placed in a dynamic place. (Templates in general)
-            copy2(self.conf.vars['C_LAMBDASTANDARD_FUNC'], self.project_dir)
+            with open(os.path.join(self.project_dir, "index.py"), "w") as text_file:
+                text_file.write(pkgutil.get_data("lambda_toolkit", self.conf.vars['C_LAMBDASTANDARD_FUNC']))
+
             self.log.info("Project " + self.projectname + " has been created.")
             self.conf.config.add_section(self.projectname)
             self.conf.config.set(self.projectname, "deployed", "False")

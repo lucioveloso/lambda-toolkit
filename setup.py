@@ -34,7 +34,7 @@ setup_options = dict(
     scripts=['bin/lt'],
     packages=find_packages(exclude=['tests*']),
     package_data={
-        "lambda-toolkit": ["lambda_toolkit/templates/*/*.py", "lambda_toolkit/templates/*/*.json"]},
+        "lambda_toolkit": ["lambda_toolkit/templates/*/*.py", "lambda_toolkit/templates/*/*.json"]},
     install_requires=requires,
     classifiers=(
         'Development Status :: 4 - Beta',
