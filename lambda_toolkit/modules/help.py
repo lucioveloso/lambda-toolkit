@@ -19,8 +19,10 @@ class Help:
         print(" * Delete a lambda project:       lt delete-project [-p] --projectname <projectname>")
         print(" * Deploy a lambda project:       lt deploy-project [-p] --projectname <projectname>"
               "[-r] --rolename <rolename>")
+        print(" * Deploy all lambda projects:    lt deploy-all-projects [-r] --rolename <rolename>")
         print(" * Undeploy a lambda project:     lt undeploy-project [-p] --projectname <projectname>")
         print(" * Import a lambda project:       lt import-project [-p] --projectname <projectname>")
+        print(" * Import all lambda projects:    lt import-all-projects")
         print(" * Set a default role to lambdas: lt set-default-role [-r] --rolename <rolename> ")
         print(" * Delete the default role:       lt unset-default-role")
         print("")

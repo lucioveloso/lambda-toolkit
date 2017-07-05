@@ -106,8 +106,10 @@ Run a receiver making your lambda project process the events in the queue
  * Create a new lambda project:   lt create-project [-p] --projectname <projectname>
  * Delete a lambda project:       lt delete-project [-p] --projectname <projectname>
  * Deploy a lambda project:       lt deploy-project [-p] --projectname <projectname>[-r] --rolename <rolename>
+ * Deploy all lambda projects:    lt deploy-all-projects [-r] --rolename <rolename>
  * Undeploy a lambda project:     lt undeploy-project [-p] --projectname <projectname>
  * Import a lambda project:       lt import-project [-p] --projectname <projectname>
+ * Import all lambda projects:    lt import-all-projects
  * Set a default role to lambdas: lt set-default-role [-r] --rolename <rolename>
  * Unset the default role:        lt unset-default-role
  * Set a default role to lambdas: lt set-default-role [-r] --rolename <rolename>
