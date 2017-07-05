@@ -57,6 +57,10 @@ class Gateway:
             return Project(conf, self.projectname).deploy_project(self.rolename)
         elif self.action == "import-project":
             return Project(conf, self.projectname).import_project()
+        elif self.action == "import-all-projects":
+            return Project(conf, "bypassvalidator").import_all_projects()
+        elif self.action == "deploy-all-projects":
+            return Project(conf, "bypassvalidator").deploy_all_projects(self.rolename)
         elif self.action == "undeploy-project":
             return Project(conf, self.projectname).undeploy_project()
         elif self.action == "deploy-lambda-proxy":
