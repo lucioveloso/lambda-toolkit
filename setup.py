@@ -33,8 +33,9 @@ setup_options = dict(
     url='https://github.com/lucioveloso/lambda-toolkit',
     scripts=['bin/lt'],
     packages=find_packages(exclude=['tests*']),
+    package_data={
+        "lambda_toolkit": ["lambda_toolkit/templates/*/*"]},
     install_requires=requires,
-    license="Apache License 2.0",
     classifiers=(
         'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',

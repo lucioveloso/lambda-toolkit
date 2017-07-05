@@ -9,7 +9,8 @@ from utils import Utils
 from zipfile import ZipFile
 from urllib import urlretrieve
 import logger
-
+import pkgutil
+import sys
 
 class Project:
 
@@ -21,12 +22,41 @@ class Project:
         else:
             self.log.critical("Parameter --projectname is required.")
 
+        self.lbs = boto3.client('lambda')
         self.base_dir = os.path.join(os.path.expanduser('~'), self.conf.vars['C_BASE_DIR'])
+        self.log.info("Projects base dir: " + self.base_dir)
         self.lambdas_dir = os.path.join(self.base_dir, self.conf.vars['C_LAMBDAS_DIR'])
+        self.updates_path()
+
+    def updates_path(self):
         self.project_dir = os.path.join(self.lambdas_dir, self.projectname)
         self.project_zip_dir = os.path.join(self.lambdas_dir, self.conf.vars['C_LAMBDAS_ZIP_DIR'])
         self.project_zip_file = os.path.join(self.project_zip_dir, self.projectname + ".zip")
         self.project_zip_file_without_ext = os.path.join(self.project_zip_dir, self.projectname)
+
+    def import_all_projects(self):
+        lambdas = self.lbs.list_functions()
+        for mylb in lambdas['Functions']:
+            if not Utils.validate_reserved_sections(self.conf, mylb['FunctionName']):
+                if self.conf.config.has_option(self.conf.vars['C_CONFIG_LAMBDAPROXY'], mylb['FunctionName']):
+                    self.log.debug("Function '" + mylb['FunctionName'] + "' is a lambda-proxy. Ignoring.")
+                else:
+                    self.projectname = mylb['FunctionName']
+                    self.updates_path()
+                    self.import_project()
+            else:
+                self.log.info("Function '" + mylb['FunctionName'] + "' with reserved name. Ignoring.")
+
+        return self.conf
+
+    def deploy_all_projects(self, rolename):
+        for s in self.conf.config.sections():
+            if not Utils.validate_reserved_sections(self.conf, s):
+                self.projectname = s
+                self.updates_path();
+                self.deploy_project(rolename)
+
+        return self.conf
 
     def create_project(self):
         if Utils.validate_reserved_sections(self.conf, self.projectname):
@@ -37,8 +67,9 @@ class Project:
         else:
             self.create_project_folders()
             open(self.project_dir + "/__init__.py", 'a').close()
-            # TODO: This C_LAMBDASTANDARD_FUNC should be placed in a dynamic place. (Templates in general)
-            copy2(self.conf.vars['C_LAMBDASTANDARD_FUNC'], self.project_dir)
+            with open(os.path.join(self.project_dir, "index.py"), "w") as text_file:
+                text_file.write(pkgutil.get_data("lambda_toolkit", self.conf.vars['C_LAMBDASTANDARD_FUNC']))
+
             self.log.info("Project " + self.projectname + " has been created.")
             self.conf.config.add_section(self.projectname)
             self.conf.config.set(self.projectname, "deployed", "False")
@@ -50,7 +81,6 @@ class Project:
             self.log.critical("Reserved name: " + self.projectname)
 
         if self.conf.config.has_section(self.projectname):
-            self.conf = self.undeploy_project()
             self.conf.config.remove_section(self.projectname)
             if not os.path.exists(self.project_dir):
                 self.log.warn("The folder '" + self.project_dir + "' does not exist. Ignoring folder removing.")
@@ -63,25 +93,27 @@ class Project:
         return self.conf
 
     def import_project(self):
-        if self.conf.config.has_section(self.projectname):
-            self.log.critical("Project " + self.projectname + " already exists in your configuration.")
-
-        lbs = boto3.client('lambda')
-
         try:
-            lambda_function = lbs.get_function(FunctionName=self.projectname)
-            self.create_project_folders();
+            lambda_function = self.lbs.get_function(FunctionName=self.projectname)
+
+            if self.conf.config.has_section(self.projectname):
+                self.log.info("Project '" + self.projectname + "' already exists in your configuration. Updating.")
+                self.conf.config.set(self.projectname, "deployed", "True")
+            else:
+                self.create_project_folders();
+                open(self.project_dir + "/__init__.py", 'a').close()
+                self.conf.config.add_section(self.projectname)
+                self.conf.config.set(self.projectname, "deployed", "True")
+                self.log.info("Project " + self.projectname + " imported.")
+
             urlretrieve(lambda_function['Code']['Location'], self.project_zip_file)
-            open(self.project_dir + "/__init__.py", 'a').close()
             zip_ref = ZipFile(self.project_zip_file, 'r')
             zip_ref.extractall(self.project_dir)
             zip_ref.close()
-            self.conf.config.add_section(self.projectname)
-            self.conf.config.set(self.projectname, "deployed", "True")
-            self.log.info("Project " + self.projectname + " imported.")
+
         except Exception as e:
             self.log.error(str(e))
-            self.log.critical("The project " + self.projectname + " does not exist in AWS environment.")
+            self.log.critical("The project '" + self.projectname + "' does not exist in AWS environment.")
 
         return self.conf
 
@@ -91,25 +123,23 @@ class Project:
         if not self.conf.config.has_section(self.projectname):
             self.log.critical("Project " + self.projectname + " does not exist.")
 
-        lbs = boto3.client('lambda')
-
         make_archive(self.project_zip_file_without_ext, "zip", self.project_dir)
 
         try:
-            lbs.get_function(FunctionName=self.projectname)
+            self.lbs.get_function(FunctionName=self.projectname)
             replace = True
         except Exception:
             replace = False
 
         try:
             if replace:
-                lbs.update_function_code(
+                self.lbs.update_function_code(
                     FunctionName=self.projectname,
                     ZipFile=open(self.project_zip_file, "rb").read()
                 )
                 self.log.info("Lambda project " + self.projectname + " was redeployed.")
             else:
-                lbs.create_function(
+                self.lbs.create_function(
                     FunctionName=self.projectname,
                     Runtime='python2.7',
                     Role=rolename,
@@ -135,9 +165,8 @@ class Project:
         if not self.conf.config.has_section(self.projectname):
             self.log.critical("Project '" + self.projectname + "' does not exist.")
 
-        lbs = boto3.client('lambda')
         try:
-            lbs.delete_function(FunctionName=self.projectname)
+            self.lbs.delete_function(FunctionName=self.projectname)
             self.log.info("Project '" + self.projectname + "' is now undeployed.")
         except Exception as e:
             self.log.warn("Project '" + self.projectname + "' is not deployed.")

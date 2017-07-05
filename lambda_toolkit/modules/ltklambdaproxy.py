@@ -6,6 +6,7 @@ from shutil import rmtree
 from shutil import make_archive
 import os
 import logger
+import pkgutil
 
 
 class Ltklambdaproxy:
@@ -43,11 +44,10 @@ class Ltklambdaproxy:
 
         os.mkdir(self.lambdaproxy_dir)
 
-        f1 = open(self.conf.vars['C_LAMBDAPROXY_FUNC'], "r")
+        f1 = pkgutil.get_data("lambda_toolkit", self.conf.vars['C_LAMBDAPROXY_FUNC'])
         f2 = open(os.path.join(self.lambdaproxy_dir, "index.py"), "w")
         for line in f1:
             f2.write(line.replace(self.conf.vars['C_LAMBDASTANDERD_FUNC_VAR_REPLACE'], sqsname))
-        f1.close()
         f2.close()
 
         make_archive(self.lambdaproxy_zip_file_without_ext, "zip", self.lambdaproxy_dir)
