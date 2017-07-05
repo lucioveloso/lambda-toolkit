@@ -26,6 +26,9 @@ class Project:
         self.base_dir = os.path.join(os.path.expanduser('~'), self.conf.vars['C_BASE_DIR'])
         self.log.info("Projects base dir: " + self.base_dir)
         self.lambdas_dir = os.path.join(self.base_dir, self.conf.vars['C_LAMBDAS_DIR'])
+        self.updates_path()
+
+    def updates_path(self):
         self.project_dir = os.path.join(self.lambdas_dir, self.projectname)
         self.project_zip_dir = os.path.join(self.lambdas_dir, self.conf.vars['C_LAMBDAS_ZIP_DIR'])
         self.project_zip_file = os.path.join(self.project_zip_dir, self.projectname + ".zip")
@@ -39,6 +42,7 @@ class Project:
                     self.log.debug("Function '" + mylb['FunctionName'] + "' is a lambda-proxy. Ignoring.")
                 else:
                     self.projectname = mylb['FunctionName']
+                    self.updates_path()
                     self.import_project()
             else:
                 self.log.info("Function '" + mylb['FunctionName'] + "' with reserved name. Ignoring.")
@@ -49,6 +53,7 @@ class Project:
         for s in self.conf.config.sections():
             if not Utils.validate_reserved_sections(self.conf, s):
                 self.projectname = s
+                self.updates_path();
                 self.deploy_project(rolename)
 
         return self.conf
