@@ -19,7 +19,7 @@ class Ltklambdaproxy:
         else:
             self.log.critical("Parameter --lambdaname are required.")
 
-        self.base_dir = os.path.join(os.path.expanduser('~'), self.conf.vars['C_BASE_DIR'])
+        self.base_dir = os.path.expanduser(self.conf.vars['C_BASE_DIR'])
         self.lambdas_dir = os.path.join(self.base_dir, self.conf.vars['C_LAMBDAS_DIR'])
         self.lambdaproxy_dir = os.path.join(self.lambdas_dir, self.lambdaname)
         self.lambdaproxy_zip_dir = os.path.join(self.lambdas_dir, self.conf.vars['C_LAMBDAS_ZIP_DIR'])

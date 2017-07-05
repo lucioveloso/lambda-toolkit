@@ -23,7 +23,7 @@ class Project:
             self.log.critical("Parameter --projectname is required.")
 
         self.lbs = boto3.client('lambda')
-        self.base_dir = os.path.join(os.path.expanduser('~'), self.conf.vars['C_BASE_DIR'])
+        self.base_dir = os.path.expanduser(self.conf.vars['C_BASE_DIR'])
         self.log.info("Projects base dir: " + self.base_dir)
         self.lambdas_dir = os.path.join(self.base_dir, self.conf.vars['C_LAMBDAS_DIR'])
         self.updates_path()

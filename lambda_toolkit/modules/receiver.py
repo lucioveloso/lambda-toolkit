@@ -28,7 +28,7 @@ class Receiver:
         sqs = boto3.resource('sqs')
         queue = sqs.get_queue_by_name(QueueName=self.sqsname)
         self.log.info("Importing project " + self.projectname)
-        pp = os.path.expanduser('~') + "/" + self.conf.vars['C_BASE_DIR'] + "lambdas"
+        pp = os.path.join(os.path.expanduser(self.conf.vars['C_BASE_DIR']), "lambdas")
         sys.path.append(pp)
         lambdas = __import__(self.projectname + ".index")
 
