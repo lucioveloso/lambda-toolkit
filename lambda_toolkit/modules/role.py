@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-import logger
 import boto3
 import logger
 

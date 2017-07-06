@@ -12,6 +12,7 @@ import logger
 import pkgutil
 import sys
 
+
 class Project:
 
     def __init__(self, conf, projectname):
@@ -100,7 +101,7 @@ class Project:
                 self.log.info("Project '" + self.projectname + "' already exists in your configuration. Updating.")
                 self.conf.config.set(self.projectname, "deployed", "True")
             else:
-                self.create_project_folders();
+                self.create_project_folders()
                 open(self.project_dir + "/__init__.py", 'a').close()
                 self.conf.config.add_section(self.projectname)
                 self.conf.config.set(self.projectname, "deployed", "True")

@@ -8,6 +8,7 @@ from utils import Utils
 import logger
 import os
 
+
 class Receiver:
 
     def __init__(self, conf, sqsname, projectname):

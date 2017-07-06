@@ -19,14 +19,16 @@ class Tail:
         client = boto3.client('logs')
         current_time = int(time.time() * 1000) - int(self.conf.vars['C_CONFIG_TAIL_TIME_PREVIOUS_LOG'])
 
-        print ("Collecting logs in real time, starting from " + str(int(self.conf.vars['C_CONFIG_TAIL_TIME_PREVIOUS_LOG']) / 1000 / 60) + " minutes ago")
-        logGroupName = "/aws/lambda/" + self.lambdaname
+        print ("Collecting logs in real time, starting from "
+               + str(int(self.conf.vars['C_CONFIG_TAIL_TIME_PREVIOUS_LOG']) / 1000 / 60)
+               + " minutes ago")
+        log_group_name = "/aws/lambda/" + self.lambdaname
         while True:
             try:
                 paginator = client.get_paginator('describe_log_streams')
-                for page in paginator.paginate(logGroupName=logGroupName):
+                for page in paginator.paginate(logGroupName=log_group_name):
                     for stream in page.get('logStreams', []):
-                        response = client.get_log_events(logGroupName=logGroupName,
+                        response = client.get_log_events(logGroupName=log_group_name,
                                                          logStreamName=stream['logStreamName'],
                                                          startTime=current_time)
                         new_current_time = int(time.time() * 1000)
@@ -37,11 +39,9 @@ class Tail:
 
                                 print("*************")
 
-
-
                                 current_time = new_current_time
             except Exception as e:
                 self.log.debug(e)
-                self.log.critical("Failed to load the logGroupName '" + logGroupName + "'." )
+                self.log.critical("Failed to load the logGroupName '" + log_group_name + "'.")
 
             time.sleep(int(self.conf.vars['C_CONFIG_TAIL_TIME_TO_SLEEP']))
