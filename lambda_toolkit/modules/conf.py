@@ -82,7 +82,7 @@ class Conf:
             self.log.info("Creating a new config file: '" + self.config_file + "'")
             open(self.config_file, 'a').close()
             self.config.add_section("settings")
-            self.config.set("settings", "C_BASE_DIR", "\"lambda-toolkit/\"")
+            self.config.set("settings", "C_BASE_DIR", "\"~/lambda-toolkit/\"")
             self.config.set("settings", "C_LAMBDAS_DIR", "\"lambdas/\"")
             self.config.set("settings", "C_LAMBDAS_ZIP_DIR", "\".zips/\"")
             self.config.set("settings", "C_LAMBDAPROXY_FUNC", "\"templates/lambda-proxy/index.py\"")
