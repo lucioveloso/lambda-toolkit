@@ -28,9 +28,10 @@ class Receiver:
         sqs = boto3.resource('sqs')
         queue = sqs.get_queue_by_name(QueueName=self.sqsname)
         self.log.info("Importing project " + self.projectname)
-        pp = os.path.join(os.path.expanduser(self.conf.vars['C_BASE_DIR']), "lambdas")
+        pp = os.path.join(os.path.expanduser(self.conf.vars['C_BASE_DIR']), self.conf.vars['C_LAMBDAS_DIR'], self.projectname)
         sys.path.append(pp)
-        lambdas = __import__(self.projectname + ".index")
+        a = __import__("index")
+        func = getattr(a, "lambda_handler")
 
         self.log.info("Starting the receiver using the queue " + self.sqsname)
         while True:
@@ -44,8 +45,6 @@ class Receiver:
                 jsonmsg = json.loads(msg.body)
                 self.log.info("=======================================")
                 self.log.info("* New message. Sending to " + self.projectname)
-                func = getattr(getattr(lambdas, "index"), "lambda_handler")
-                #func = getattr(getattr(getattr(lambdas, self.projectname), "index"), "lambda_handler")
 
                 if func(jsonmsg["event"], json.loads(json.dumps(jsonmsg["context"]),
                                                      object_hook=lambda d: namedtuple('X', d.keys())(*d.values()))):
