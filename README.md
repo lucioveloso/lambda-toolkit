@@ -101,6 +101,7 @@ Run a receiver making your lambda project process the events in the queue
  * List projects:                 lt list
  * Add SQS:                       lt create-sqs [-q] --sqsname <queuename>
  * Delete SQS:                    lt delete-sqs [-q] --sqsname <queuename>
+ * Purge SQS:                     lt purge-sqs [-q] --sqsname <queuename>
  * Deploy Lambda Proxy:           lt deploy-lambda-proxy [-l] --lambdaname <lambdaname> [-q] --sqsname <queuename> [-r] --rolename <rolename>
  * Undeploy Lambda proxy:         lt undeploy-lambda-proxy [-l] --lambdaname <lambdaname>
  * Create a new lambda project:   lt create-project [-p] --projectname <projectname>
@@ -141,6 +142,14 @@ Create a SQS in your AWS environment.
 Required argument:
 
 * sqsname: SQS Queue name to be removed.
+
+###### purge-sqs
+
+Purge the messages from a SQS in your AWS environment.
+
+Required argument:
+
+* sqsname: SQS Queue name to be purged.
 
 ###### deploy-lambda-proxy
 
