@@ -46,7 +46,7 @@ class Ltklambdaproxy:
 
         f1 = pkgutil.get_data("lambda_toolkit", self.conf.vars['C_LAMBDAPROXY_FUNC'])
         f2 = open(os.path.join(self.lambdaproxy_dir, "index.py"), "w")
-        for line in f1:
+        for line in f1.splitlines():
             f2.write(line.replace(self.conf.vars['C_LAMBDASTANDERD_FUNC_VAR_REPLACE'], sqsname))
         f2.close()
 
