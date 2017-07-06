@@ -8,7 +8,7 @@ __pycache__/
 
 # C extensions
 *.so
-
+ignore.xml
 # macOS
 *.DS_Store
 _mac/

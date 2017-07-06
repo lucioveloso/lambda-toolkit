@@ -24,7 +24,6 @@ class Ltklambdaproxy:
         self.lambdaproxy_dir = os.path.join(self.lambdas_dir, self.lambdaname)
         self.lambdaproxy_zip_dir = os.path.join(self.lambdas_dir, self.conf.vars['C_LAMBDAS_ZIP_DIR'])
         self.lambdaproxy_zip_file = os.path.join(self.lambdaproxy_zip_dir, self.lambdaname + ".zip")
-        self.lambdaproxy_zip_file_without_ext = os.path.join(self.lambdaproxy_zip_dir, self.lambdaname)
 
     def deploy_lambda_proxy(self, rolename, sqsname):
         rolename = Utils.define_lambda_role(self.conf, rolename)
@@ -42,18 +41,21 @@ class Ltklambdaproxy:
             if self.conf.config.has_option(self.conf.vars['C_CONFIG_LAMBDAPROXY'], self.lambdaname):
                 self.log.critical("Lambda proxy " + self.lambdaname + " already exists")
 
-        os.mkdir(self.lambdaproxy_dir)
+        try:
+            os.mkdir(self.lambdaproxy_dir)
+        except Exception as a:
+            self.log.debug("Proxy temp folder already exists")
+
         f1 = pkgutil.get_data("lambda_toolkit", self.conf.vars['C_LAMBDAPROXY_FUNC'])
         f2 = open(os.path.join(self.lambdaproxy_dir, "index.py"), "w")
         for line in f1.splitlines():
+            print(line.replace(self.conf.vars['C_LAMBDASTANDERD_FUNC_VAR_REPLACE'], sqsname))
             f2.write(line.replace(self.conf.vars['C_LAMBDASTANDERD_FUNC_VAR_REPLACE'], sqsname))
-
+            f2.write("\n")
         f2.close()
-
-        make_archive(self.lambdaproxy_zip_file_without_ext, "zip", self.lambdaproxy_dir)
+        make_archive(os.path.splitext(self.lambdaproxy_zip_file)[0], "zip", self.lambdaproxy_dir)
 
         lbs = boto3.client('lambda')
-
         try:
             lbs.create_function(
                 FunctionName=self.lambdaname,
