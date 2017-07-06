@@ -12,7 +12,14 @@ __pycache__/
 # macOS
 *.DS_Store
 _mac/
-
+codestyles/
+colors.scheme.xml
+databaseSettings.xml
+debugger.xml
+editor.xml
+ignore.xml
+markdown.xml
+ui.lnf.xml
 # Distribution / packaging
 .Python
 env/
