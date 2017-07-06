@@ -21,11 +21,11 @@ class Utils:
         return []
 
     @staticmethod
-    def append_fifo_in_queue(queueName):
-        if queueName.endswith(".fifo"):
-            return queueName
+    def append_fifo_in_queue(queuename):
+        if queuename.endswith(".fifo"):
+            return queuename
         else:
-            return queueName + ".fifo"
+            return queuename + ".fifo"
 
     @staticmethod
     def validate_reserved_sections(conf, p):

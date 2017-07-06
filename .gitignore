@@ -1,25 +1,12 @@
-# Created by .ignore support plugin (hsz.mobi)
+
 .config.cfg
-### Python template
-# Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
-
-# C extensions
-*.so
-ignore.xml
-# macOS
+*.xml
 *.DS_Store
 _mac/
 codestyles/
-colors.scheme.xml
-databaseSettings.xml
-debugger.xml
-editor.xml
-ignore.xml
-markdown.xml
-ui.lnf.xml
 # Distribution / packaging
 .Python
 env/

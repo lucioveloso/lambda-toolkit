@@ -19,11 +19,10 @@ class Gateway:
     lambdaname = ""
     rolename = ""
 
-    def __init__(self,action, args):
+    def __init__(self, action, args):
         self.log = logger.get_my_logger("gateway")
         self.action = action
         self.get_args(args)
-
 
     def get_args(self, args):
         try:
