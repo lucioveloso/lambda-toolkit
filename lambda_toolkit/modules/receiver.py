@@ -49,8 +49,13 @@ class Receiver:
 
                 if func(jsonmsg["event"], json.loads(json.dumps(jsonmsg["context"]),
                                                      object_hook=lambda d: namedtuple('X', d.keys())(*d.values()))):
-                    msg.delete()
-                    self.log.info("* Message deleted.")
+                    try:
+                        msg.delete()
+                        self.log.info("* Message deleted.")
+                    except Exception as e:
+                        self.log.warn("* Failed to delete the message. Expired.")
+                        self.log.warn("Configured timeout [QUEUE_GETMESSAGE_VISIBILITY_TIMEOUT]: " +self.conf.vars['QUEUE_GETMESSAGE_VISIBILITY_TIMEOUT'])
+
                 else:
                     self.log.info("* Project " + self.projectname + " returned False. Keeping message in the queue.")
 

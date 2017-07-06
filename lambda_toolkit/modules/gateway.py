@@ -52,6 +52,8 @@ class Gateway:
             return Queue(conf, self.sqsname).create_queue()
         elif self.action == "delete-sqs":
             return Queue(conf, self.sqsname).delete_queue()
+        elif self.action == "purge-sqs":
+            Queue(conf, self.sqsname).purge_queue()
         elif self.action == "deploy-project":
             return Project(conf, self.projectname).deploy_project(self.rolename)
         elif self.action == "import-project":

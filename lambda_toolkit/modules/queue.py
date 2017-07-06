@@ -37,6 +37,20 @@ class Queue:
 
         return self.conf
 
+    def purge_queue(self):
+        sqs = boto3.client('sqs')
+        queues = self.list_queues()
+        if self.sqsname in queues:
+            try:
+                response = sqs.get_queue_url(QueueName=self.sqsname)
+                sqs.purge_queue(QueueUrl=response['QueueUrl'])
+                self.log.info("The queue '" + self.sqsname + "' has been purged.")
+            except Exception as e:
+                self.log.error(str(e))
+                self.log.critical("Failed to purge the queue '" + self.sqsname + "'.")
+        else:
+            self.log.critical("The queue '" + self.sqsname + "' does not exist.")
+
     def delete_queue(self):
         sqs = boto3.client('sqs')
         self.verify_queue_in_use()
