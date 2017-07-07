@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
 ./build.sh
-twine upload dist/*
+twine upload --config-file .pypirc dist/*
