@@ -28,7 +28,6 @@ http://recordit.co/hyYc2jKeJd
 #### Prerequisites
 
 * Python 2.7
-* Git client
 * AWS account configured in your user profile
 
 #### Installing
