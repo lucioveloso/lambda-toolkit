@@ -18,7 +18,6 @@ def cli(**kwargs):
     pass
 
 if len(sys.argv) > 1 and sys.argv[1] == "tail":
-    sys.path.append("/Users/glucio/PycharmProjects/tail-toolkit/")
     import tail_toolkit.modules.cli
 
 conf = Conf()
