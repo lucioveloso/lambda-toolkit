@@ -1,18 +1,18 @@
 #!/usr/bin/env python
 
-import boto3
 import os
-from shutil import rmtree
-from shutil import make_archive
-from utils import Utils
-from zipfile import ZipFile
-from urllib import urlretrieve
-import logger
 import pkgutil
+from shutil import make_archive
+from shutil import rmtree
+from urllib import urlretrieve
+from zipfile import ZipFile
+
+import boto3
+
+import logger
 
 
 class Project:
-
     def __init__(self, conf, kwargs):
         self.lbs = boto3.client('lambda')
         self.log = logger.get_my_logger("project")
@@ -25,27 +25,29 @@ class Project:
         if kwargs['projectname'] is not None:
             self._set_project(kwargs['projectname'])
 
-
     def importall_project(self):
         lambdas = self.lbs.list_functions()
         for mylb in lambdas['Functions']:
             self._set_project(mylb['FunctionName'])
             self.import_project()
 
+        self.log.info("Imported all projects.")
         return self.conf
 
-    def deployall_project(self):
+    def deploy_all_project(self):
         for s in self.projects:
-            self._set_project(s);
+            self._set_project(s)
             self.deploy_project()
 
+        self.log.info("Deployed all projects.")
         return self.conf
 
-    def undeployall_project(self):
+    def undeploy_all_project(self):
         for s in self.projects:
-            self._set_project(s);
+            self._set_project(s)
             self.undeploy_project()
 
+        self.log.info("Undeployed all projects.")
         return self.conf
 
     def create_project(self):
@@ -62,7 +64,6 @@ class Project:
                 with open(os.path.join(self.project_dir, "index.js"), "w") as text_file:
                     text_file.write(pkgutil.get_data("lambda_toolkit", self.conf.sett['C_LAMBDASTANDARD_FUNC_JS']))
 
-
             self.log.info("Project " + self.projectname + " has been created.")
             self.conf.projects[self.projectname] = {}
             self.conf.projects[self.projectname]['deployed'] = False
@@ -70,11 +71,12 @@ class Project:
 
         return self.conf
 
-    def deleteall_project(self):
+    def delete_all_project(self):
         for s in self.projects:
             self._set_project(s)
             self.delete_project()
 
+        self.log.info("Deleted all projects.")
         return self.conf
 
     def delete_project(self):
@@ -91,7 +93,10 @@ class Project:
         return self.conf
 
     def import_project(self):
-        # TODO: Validate if it is lambda-proxy
+        if self.projectname in self.conf.proxies.keys():
+            self.log.warn("Project '" + self.projectname + "' is a proxy. Ignoring import.")
+            return self.conf
+
         try:
             lambda_function = self.lbs.get_function(FunctionName=self.projectname)
 
@@ -158,7 +163,6 @@ class Project:
         os.remove(self.project_zip_file)
         return self.conf
 
-
     def undeploy_project(self):
         if self.projectname not in self.projects:
             self.log.critical("Project '" + self.projectname + "' does not exist.")
@@ -201,9 +205,11 @@ class Project:
             os.mkdir(self.project_zip_dir)
 
     def _set_project(self, projectname):
+        self.log.debug("Updating project environment to: '" + projectname + "'")
         self.projectname = projectname
         projectname_region = projectname + "_" + self.conf.region
         self.project_dir = os.path.join(self.lambdas_dir, projectname_region)
-        self.project_zip_dir = os.path.join(self.lambdas_dir, self.conf.sett['C_LAMBDAS_ZIP_DIR'] + "_" + self.conf.region)
+        self.project_zip_dir = os.path.join(self.lambdas_dir,
+                                            self.conf.sett['C_LAMBDAS_ZIP_DIR'] + "_" + self.conf.region)
         self.project_zip_file = os.path.join(self.project_zip_dir, projectname_region + ".zip")
         self.project_zip_file_without_ext = os.path.join(self.project_zip_dir, projectname_region)

@@ -1,16 +1,16 @@
 #!/usr/bin/env python
 
-import boto3
-from utils import Utils
-from shutil import rmtree
-from shutil import make_archive
 import os
-import logger
 import pkgutil
+from shutil import make_archive
+from shutil import rmtree
+
+import boto3
+
+import logger
 
 
 class Proxy:
-
     def __init__(self, conf, kwargs):
         self.lbs = boto3.client('lambda')
         self.log = logger.get_my_logger("ltklambdaproxy")
@@ -28,16 +28,17 @@ class Proxy:
             self.log.info("Proxies (Lambda proxies):")
             for q in self.proxies:
                 self.log.info("- Proxy name '" + q + "' pointing to the queue '"
-                              + self.conf.proxies[q]['sqsname'] +"'\t [Runtime: " +
+                              + self.conf.proxies[q]['sqsname'] + "'\t [Runtime: " +
                               self.conf.proxies[q]['runtime'] + "]")
 
         return self.conf
 
-    def undeployall_proxy(self):
+    def undeploy_all_proxy(self):
         for q in self.proxies:
             self._set_proxyname(q)
             self.undeploy_proxy()
 
+        self.log.info("Undeployed all proxies.")
         return self.conf
 
     def deploy_proxy(self):
@@ -54,13 +55,18 @@ class Proxy:
             self.log.debug("Proxy temp folder already exists")
 
         f1 = pkgutil.get_data("lambda_toolkit", self.conf.sett['C_LAMBDAPROXY_FUNC'])
-        f2 = open(os.path.join(self.lambdaproxy_dir, "index.py"), "w")
+        if 'python' in self.kwargs['runtime']:
+            index_file = "index.py"
+        elif 'nodejs' in self.kwargs['runtime']:
+            index_file = "index.js"
+
+        f2 = open(os.path.join(self.lambdaproxy_dir, index_file), "w")
         for line in f1.splitlines():
             f2.write(line.replace(self.conf.sett['C_LAMBDASTANDERD_FUNC_VAR_REPLACE'], self.kwargs['sqsname']))
             f2.write("\n")
         f2.close()
-        make_archive(os.path.splitext(self.lambdaproxy_zip_file)[0], "zip", self.lambdaproxy_dir)
 
+        make_archive(os.path.splitext(self.lambdaproxy_zip_file)[0], "zip", self.lambdaproxy_dir)
 
         try:
             self.lbs.create_function(
@@ -68,7 +74,8 @@ class Proxy:
                 Runtime=self.kwargs['runtime'],
                 Role=self.kwargs['rolename'],
                 Handler='index.lambda_handler',
-                Description="Proxy lambda function " + self.proxyname + "proxying requests to " + self.kwargs['sqsname'],
+                Description="Proxy lambda function " + self.proxyname + "proxying requests to " + self.kwargs[
+                    'sqsname'],
                 Code={
                     'ZipFile': open(self.lambdaproxy_zip_file, "rb").read()
                 }
@@ -85,7 +92,6 @@ class Proxy:
         rmtree(self.lambdaproxy_dir)
 
         return self.conf
-
 
     def undeploy_proxy(self):
         if self.proxyname not in self.proxies:
@@ -104,6 +110,7 @@ class Proxy:
         return self.conf
 
     def _set_proxyname(self, proxyname):
+        self.log.debug("Updating proxy environment to: '" + proxyname + "'")
         self.proxyname = proxyname
         proxyname_region = proxyname + "_" + self.conf.region
         self.lambdaproxy_dir = os.path.join(self.lambdas_dir, self.proxyname)

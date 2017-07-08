@@ -1,37 +1,33 @@
 #!/usr/bin/env python
 
 from conf import Conf
-from queue import Queue
-from project import Project
 from utils import Utils
 import click
-import json
 from lambda_toolkit import __version__
+import sys
 
-
-conf = Conf(".lambda-toolkit.cfg")
-
-default_role = None
-if 'C_DEFAULT_ROLE' in conf.sett:
-    default_role = conf.sett['C_DEFAULT_ROLE']
-
-def execute_cli(m_arg):
+def execute_cli(args):
     Utils.click_validate_required_options(click.get_current_context(), conf)
     module = click.get_current_context().info_name
     myclass = __import__("lambda_toolkit.modules." + module)
     clazz = getattr(getattr(myclass.modules, module), module.title())
-    getattr(clazz(conf, m_arg), m_arg['action'].replace("-", "") + "_" + module)().save_config()
+    getattr(clazz(conf, args), args['action'].replace("-", "_") + "_" + module)().save_config()
 
 @click.group()
-@click.option('-v', '--version')
 def cli(**kwargs):
     pass
+
+if len(sys.argv) > 1 and sys.argv[1] == "tail":
+    sys.path.append("/Users/glucio/PycharmProjects/tail-toolkit/")
+    import tail_toolkit.modules.cli
+
+conf = Conf()
 
 @cli.command()
 @click.argument('action', required=True, type=click.Choice(Utils.click_get_command_choice("queue", conf)))
 @click.option('--sqsname', '-q', callback=Utils.click_append_fifo_in_queue, help="Define the queue.")
+@Utils.docstring_parameter(conf)
 def queue(**kwargs):
-    """Manage yours SQS Queues"""
     execute_cli(kwargs)
 
 @cli.command()
@@ -39,25 +35,37 @@ def queue(**kwargs):
 @click.option('--proxyname', '-p', help="Define the proxy name.")
 @click.option('--sqsname', '-q', callback=Utils.click_append_fifo_in_queue, help="Define the queue name.",
               type=click.Choice(Utils.click_list_queues_without_fifo(conf)))
-@click.option('--rolename', '-r', default=default_role, callback=Utils.click_verify_role_exists,
+@click.option('--rolename', '-r', default=Utils.get_default_role(conf), callback=Utils.click_verify_role_exists,
               help="Define the role or try to get the default.")
 @click.option('--runtime','-e', default="python2.7", help="Define runtime. (Default: Python2.7)",
               type=click.Choice(Utils.click_list_runtime()))
+@Utils.docstring_parameter(conf)
 def proxy(**kwargs):
-    """Manage yours lambda proxies"""
     execute_cli(kwargs)
 
 @cli.command()
 @click.argument('action', required=True, type=click.Choice(Utils.click_get_command_choice("project", conf)))
 @click.option( '--projectname', '-p', help="Define the project.")
-@click.option('--rolename', '-r', default=default_role, callback=Utils.click_verify_role_exists,
+@click.option('--rolename', '-r', default=Utils.get_default_role(conf), callback=Utils.click_verify_role_exists,
               help="Define the role or try to get the default.")
 @click.option('--runtime','-e', default="python2.7", help="Define runtime. (Default: Python2.7)",
-                type=click.Choice(Utils.click_list_runtime()))
+              type=click.Choice(Utils.click_list_runtime()))
+@Utils.docstring_parameter(conf)
 def project(**kwargs):
-    """Manage yours lambda projects:"""
     execute_cli(kwargs)
 
+@cli.command()
+@click.argument('action', required=True, type=click.Choice(Utils.click_get_command_choice("role", conf)))
+@click.option('--rolename', '-r', default=Utils.get_default_role(conf),
+              help="Define the role or try to get the default.")
+@Utils.docstring_parameter(conf)
+def role(**kwargs):
+    execute_cli(kwargs)
+
+@cli.command()
+def tail(**kwargs):
+    """Forward to tail-toolkit"""
+    pass
 
 print("Initializing lambda-toolkit CLI (v" + __version__ + ") - Region: " + conf.region)
 cli()

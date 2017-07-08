@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 
 import boto3
+
 import logger
 
 
 class Queue:
-
     def __init__(self, conf, kwargs):
         self.sqs = boto3.client('sqs')
         self.log = logger.get_my_logger("queue")
@@ -45,7 +45,7 @@ class Queue:
 
         return self.conf
 
-    def deleteall_queue(self):
+    def delete_all_queue(self):
         for q in self.queues:
             self.sqsname = q
             self.delete_queue()
@@ -53,7 +53,12 @@ class Queue:
         return self.conf
 
     def delete_queue(self):
-        self._verify_queue_in_use()
+        uses = self._verify_queue_in_use()
+        if uses is not None and len(uses) > 0:
+            self.log.warn("Impossible to remove '" + self.sqsname + "'."
+                          + " The lambda-proxy '"
+                          + ', '.join(map(str, uses)) + "' is using it.")
+            return self.conf
 
         if self.sqsname in self.queues:
             try:
@@ -74,13 +79,21 @@ class Queue:
         if len(self.queues) > 0:
             self.log.info("SQS (Queues):")
             for q in self.queues:
-                self.log.info("- Queue name: " + q)
+                self.sqsname = q
+                uses = self._verify_queue_in_use()
+                display_uses = ""
+                if uses is not None and len(uses) > 0:
+                    display_uses = "\t[Used by: " + ', '.join(map(str, uses)) + "]"
+
+                self.log.info("- Queue name: " + q + display_uses)
+
 
         return self.conf
 
     def _verify_queue_in_use(self):
+        used = []
         for q in self.conf.proxies.keys():
             if self.conf.proxies[q]['sqsname'] == self.sqsname:
-                self.log.critical("Impossible to remove '" + self.sqsname + "'."
-                                  + " The lambda-proxy '"
-                                  + q + "' is using it.")
+                used.append(q)
+
+        return used

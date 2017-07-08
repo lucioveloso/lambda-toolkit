@@ -1,0 +1,10 @@
+Manage Projects                                        :
+
+ project create --help for deep information.
+
+ Examples:
+
+ project create -p myProject -r arn:xxx: -e python2.7
+ project deploy-all
+ project undeploy-all
+ project import -p myAwsExistingProject

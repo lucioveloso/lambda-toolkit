@@ -1,16 +1,17 @@
 #!/usr/bin/env python
 
-import boto3
 import json
+import os
 import sys
 from collections import namedtuple
-from utils import Utils
+
+import boto3
+
 import logger
-import os
+from utils import Utils
 
 
 class Receiver:
-
     def __init__(self, conf, sqsname, projectname):
         self.log = logger.get_my_logger("receiver")
         self.conf = conf
@@ -21,7 +22,8 @@ class Receiver:
             self.log.critical("Parameter --sqsname and --projectname are required.")
 
     def receiver(self):
-        if self.sqsname not in Utils.get_list_config(self.conf, self.conf.vars['C_CONFIG_SQS'], self.conf.vars['C_CONFIG_SQS_QUEUES']):
+        if self.sqsname not in Utils.get_list_config(self.conf, self.conf.vars['C_CONFIG_SQS'],
+                                                     self.conf.vars['C_CONFIG_SQS_QUEUES']):
             self.log.critical("The queue " + self.sqsname + " does not exist.")
         if not self.conf.config.has_section(self.projectname):
             self.log.critical("Project" + self.projectname + " does not exist.")
@@ -29,7 +31,8 @@ class Receiver:
         sqs = boto3.resource('sqs')
         queue = sqs.get_queue_by_name(QueueName=self.sqsname)
         self.log.info("Importing project " + self.projectname)
-        pp = os.path.join(os.path.expanduser(self.conf.vars['C_BASE_DIR']), self.conf.vars['C_LAMBDAS_DIR'], self.projectname)
+        pp = os.path.join(os.path.expanduser(self.conf.vars['C_BASE_DIR']), self.conf.vars['C_LAMBDAS_DIR'],
+                          self.projectname)
         sys.path.append(pp)
         a = __import__("index")
         func = getattr(a, "lambda_handler")
@@ -54,7 +57,8 @@ class Receiver:
                         self.log.info("* Message deleted.")
                     except Exception as e:
                         self.log.warn("* Failed to delete the message. Expired.")
-                        self.log.warn("Configured timeout [QUEUE_GETMESSAGE_VISIBILITY_TIMEOUT]: " +self.conf.vars['QUEUE_GETMESSAGE_VISIBILITY_TIMEOUT'])
+                        self.log.warn("Configured timeout [QUEUE_GETMESSAGE_VISIBILITY_TIMEOUT]: " + self.conf.vars[
+                            'QUEUE_GETMESSAGE_VISIBILITY_TIMEOUT'])
 
                 else:
                     self.log.info("* Project " + self.projectname + " returned False. Keeping message in the queue.")
