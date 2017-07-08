@@ -1,0 +1,63 @@
+{
+    "cli": {
+        "proxy": {
+          "deploy": [ "sqsname", "proxyname", "rolename"],
+          "list": [],
+          "undeploy": [ "proxyname" ],
+          "undeploy-all": []
+        },
+        "queue": {
+            "purge": [
+                "sqsname"
+            ], 
+            "create": [
+                "sqsname"
+            ], 
+            "list": [], 
+            "delete": [
+                "sqsname"
+            ],
+            "delete-all": []
+        }, 
+        "project": {
+            "undeploy": [
+                "projectname"
+            ], 
+            "deploy": [
+                "projectname", 
+                "rolename"
+            ], 
+            "create": [
+                "projectname"
+            ], 
+            "list": [], 
+            "import-all": [],
+            "undeploy-all": [],
+            "import": [
+                "projectname"
+            ], 
+            "deploy-all": [
+                "rolename"
+            ], 
+            "delete": [
+                "projectname"
+            ],
+            "delete-all": []
+        }
+    }, 
+    "settings": {
+        "C_LAMBDAS_DIR": "lambdas/",
+        "C_LAMBDAS_ZIP_DIR": ".zips",
+        "C_LAMBDAPROXY_FUNC": "templates/lambda-proxy/index.py",
+        "C_LAMBDASTANDARD_FUNC_PY": "templates/standard-lambda/index.py",
+        "C_LAMBDASTANDARD_FUNC_JS": "templates/standard-lambda/index.js",
+        "QUEUE_CREATEQUEUE_VISIBILITY_TIMEOUT": 3,
+        "C_CONFIG_TAIL_TIME_TO_SLEEP": 5,
+        "C_LAMBDASTANDERD_FUNC_VAR_REPLACE": "TEMPLATEQUEUENAME",
+        "QUEUE_GETMESSAGE_VISIBILITY_TIMEOUT": 10,
+        "QUEUE_GETMESSAGE_MAXNUMBEROFMESSAGES": 10,
+        "C_BASE_DIR": "~/lambda-toolkit/",
+        "QUEUE_GETMESSAGE_WAITTIMESECONDS": 20,
+        "C_CONFIG_TAIL_TIME_PREVIOUS_LOG": 300000
+    }
+}

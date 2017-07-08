@@ -26,7 +26,6 @@ class Project:
             self._set_project(kwargs['projectname'])
 
 
-
     def importall_project(self):
         lambdas = self.lbs.list_functions()
         for mylb in lambdas['Functions']:
@@ -203,7 +202,8 @@ class Project:
 
     def _set_project(self, projectname):
         self.projectname = projectname
-        self.project_dir = os.path.join(self.lambdas_dir, self.projectname + "_" + self.conf.region)
+        projectname_region = projectname + "_" + self.conf.region
+        self.project_dir = os.path.join(self.lambdas_dir, projectname_region)
         self.project_zip_dir = os.path.join(self.lambdas_dir, self.conf.sett['C_LAMBDAS_ZIP_DIR'] + "_" + self.conf.region)
-        self.project_zip_file = os.path.join(self.project_zip_dir, self.projectname + ".zip")
-        self.project_zip_file_without_ext = os.path.join(self.project_zip_dir, self.projectname)
+        self.project_zip_file = os.path.join(self.project_zip_dir, projectname_region + ".zip")
+        self.project_zip_file_without_ext = os.path.join(self.project_zip_dir, projectname_region)

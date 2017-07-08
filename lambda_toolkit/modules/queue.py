@@ -53,9 +53,7 @@ class Queue:
         return self.conf
 
     def delete_queue(self):
-        # TODO: Verifiy if queue is in use
-        #if not self._verify_queue_in_use():
-        #    return self.conf
+        self._verify_queue_in_use()
 
         if self.sqsname in self.queues:
             try:
@@ -81,13 +79,8 @@ class Queue:
         return self.conf
 
     def _verify_queue_in_use(self):
-        # TODO: Verifiy if queue is in use
-        if self.conf.config.has_section(self.conf.sett['C_CONFIG_LAMBDAPROXY']):
-            for proxy in self.conf.config.items(self.conf.sett['C_CONFIG_LAMBDAPROXY']):
-                if str(proxy[1]) == self.sqsname:
-                    self.log.warn("Impossible to remove '" + self.sqsname + "'."
+        for q in self.conf.proxies.keys():
+            if self.conf.proxies[q]['sqsname'] == self.sqsname:
+                self.log.critical("Impossible to remove '" + self.sqsname + "'."
                                   + " The lambda-proxy '"
-                                  + proxy[0] + "' is using it.")
-                    return False
-
-        return True
+                                  + q + "' is using it.")

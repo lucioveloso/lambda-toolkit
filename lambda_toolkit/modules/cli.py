@@ -34,6 +34,18 @@ def queue(**kwargs):
     """Manage yours SQS Queues"""
     execute_cli(kwargs)
 
+@cli.command()
+@click.argument('action', required=True, type=click.Choice(Utils.click_get_command_choice("proxy", conf)))
+@click.option('--proxyname', '-p', help="Define the proxy name.")
+@click.option('--sqsname', '-q', callback=Utils.click_append_fifo_in_queue, help="Define the queue name.",
+              type=click.Choice(Utils.click_list_queues_without_fifo(conf)))
+@click.option('--rolename', '-r', default=default_role, callback=Utils.click_verify_role_exists,
+              help="Define the role or try to get the default.")
+@click.option('--runtime','-e', default="python2.7", help="Define runtime. (Default: Python2.7)",
+              type=click.Choice(Utils.click_list_runtime()))
+def proxy(**kwargs):
+    """Manage yours lambda proxies"""
+    execute_cli(kwargs)
 
 @cli.command()
 @click.argument('action', required=True, type=click.Choice(Utils.click_get_command_choice("project", conf)))
@@ -41,7 +53,7 @@ def queue(**kwargs):
 @click.option('--rolename', '-r', default=default_role, callback=Utils.click_verify_role_exists,
               help="Define the role or try to get the default.")
 @click.option('--runtime','-e', default="python2.7", help="Define runtime. (Default: Python2.7)",
-                type=click.Choice(['python2.7', 'python3.6', 'nodejs6.10', 'nodejs4.3', 'nodejs4.3-edge']))
+                type=click.Choice(Utils.click_list_runtime()))
 def project(**kwargs):
     """Manage yours lambda projects:"""
     execute_cli(kwargs)

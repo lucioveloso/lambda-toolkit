@@ -9,6 +9,10 @@ class Utils:
         pass
 
     @staticmethod
+    def click_list_runtime():
+        return ['python2.7', 'python3.6', 'nodejs6.10', 'nodejs4.3', 'nodejs4.3-edge']
+
+    @staticmethod
     def click_get_command_choice(command, conf):
         opts = ['']
         if command in conf.cli:
@@ -25,6 +29,17 @@ class Utils:
                     if ctx.params[check] is None or ctx.params[check] is False:
                         print("The option '--" + check + "' is required");
                         exit(1)
+
+    @staticmethod
+    def click_list_queues_without_fifo(conf):
+        opts = ['']
+        for c in conf.queues.keys():
+            if c.endswith(".fifo"):
+                opts.append(c.replace(".fifo", ""))
+            else:
+                opts.append(c)
+        return opts
+
 
     @staticmethod
     def click_append_fifo_in_queue(ctx, param, value):

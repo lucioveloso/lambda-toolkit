@@ -12,7 +12,7 @@ class ShutdownHandler(logging.Handler):
 
 def get_my_logger(name):
     handler = logging.StreamHandler(sys.stdout)
-    handler.setFormatter(logging.Formatter('[%(levelname)s] %(message)s'))
+    handler.setFormatter(logging.Formatter('[%(name)s][%(levelname)s] %(message)s'))
 
     logger = logging.getLogger(name)
     logger.handlers[:] = [handler]
