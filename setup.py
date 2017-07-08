@@ -22,7 +22,8 @@ def find_version(*file_paths):
 
 
 requires = ['boto3>=1.4.4',
-            'botocore>=1.5.78']
+            'botocore>=1.5.78',
+            'tail-toolkit>=0.0.1']
 
 setup_options = dict(
     name='lambda-toolkit',
@@ -30,11 +31,11 @@ setup_options = dict(
     description='An AWS Lambda command line interface (CLI). It helps you in creating, building, testing and deploying your lambda functions.',
     long_description=open('README.md').read(),
     author='Lucio Veloso Guimaraes',
+    author_email='lucio.veloso@gmail.com',
     url='https://github.com/lucioveloso/lambda-toolkit',
     scripts=['bin/lt'],
     packages=find_packages(exclude=['tests*']),
-    package_data={
-        "lambda_toolkit": ["lambda_toolkit/templates/*/*"]},
+    include_package_data=True,
     install_requires=requires,
     classifiers=(
         'Development Status :: 4 - Beta',
