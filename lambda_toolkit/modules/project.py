@@ -2,7 +2,6 @@
 
 import boto3
 import os
-from shutil import copy2
 from shutil import rmtree
 from shutil import make_archive
 from utils import Utils
@@ -10,101 +9,102 @@ from zipfile import ZipFile
 from urllib import urlretrieve
 import logger
 import pkgutil
-import sys
 
 
 class Project:
 
-    def __init__(self, conf, projectname):
+    def __init__(self, conf, kwargs):
+        self.lbs = boto3.client('lambda')
         self.log = logger.get_my_logger("project")
         self.conf = conf
-        if projectname != "":
-            self.projectname = projectname
-        else:
-            self.log.critical("Parameter --projectname is required.")
+        self.projects = self.conf.projects.keys()
 
-        self.lbs = boto3.client('lambda')
-        self.base_dir = os.path.expanduser(self.conf.vars['C_BASE_DIR'])
-        self.log.info("Projects base dir: " + self.base_dir)
-        self.lambdas_dir = os.path.join(self.base_dir, self.conf.vars['C_LAMBDAS_DIR'])
-        self.updates_path()
+        self.base_dir = os.path.expanduser(self.conf.sett['C_BASE_DIR'])
+        self.lambdas_dir = os.path.join(self.base_dir, self.conf.sett['C_LAMBDAS_DIR'])
+        self.kwargs = kwargs
+        if kwargs['projectname'] is not None:
+            self._set_project(kwargs['projectname'])
 
-    def updates_path(self):
-        self.project_dir = os.path.join(self.lambdas_dir, self.projectname)
-        self.project_zip_dir = os.path.join(self.lambdas_dir, self.conf.vars['C_LAMBDAS_ZIP_DIR'])
-        self.project_zip_file = os.path.join(self.project_zip_dir, self.projectname + ".zip")
-        self.project_zip_file_without_ext = os.path.join(self.project_zip_dir, self.projectname)
 
-    def import_all_projects(self):
+
+    def importall_project(self):
         lambdas = self.lbs.list_functions()
         for mylb in lambdas['Functions']:
-            if not Utils.validate_reserved_sections(self.conf, mylb['FunctionName']):
-                if self.conf.config.has_option(self.conf.vars['C_CONFIG_LAMBDAPROXY'], mylb['FunctionName']):
-                    self.log.debug("Function '" + mylb['FunctionName'] + "' is a lambda-proxy. Ignoring.")
-                else:
-                    self.projectname = mylb['FunctionName']
-                    self.updates_path()
-                    self.import_project()
-            else:
-                self.log.info("Function '" + mylb['FunctionName'] + "' with reserved name. Ignoring.")
+            self._set_project(mylb['FunctionName'])
+            self.import_project()
 
         return self.conf
 
-    def deploy_all_projects(self, rolename):
-        for s in self.conf.config.sections():
-            if not Utils.validate_reserved_sections(self.conf, s):
-                self.projectname = s
-                self.updates_path();
-                self.deploy_project(rolename)
+    def deployall_project(self):
+        for s in self.projects:
+            self._set_project(s);
+            self.deploy_project()
+
+        return self.conf
+
+    def undeployall_project(self):
+        for s in self.projects:
+            self._set_project(s);
+            self.undeploy_project()
 
         return self.conf
 
     def create_project(self):
-        if Utils.validate_reserved_sections(self.conf, self.projectname):
-            self.log.critical("Reserved name: " + self.projectname)
-
-        if self.conf.config.has_section(self.projectname):
-            self.log.critical("Project '" + self.projectname + "' already exists in lambda-toolkit.")
+        if self.projectname in self.conf.projects:
+            self.log.warn("Project '" + self.projectname + "' already exists in lambda-toolkit.")
         else:
-            self.create_project_folders()
-            open(self.project_dir + "/__init__.py", 'a').close()
-            with open(os.path.join(self.project_dir, "index.py"), "w") as text_file:
-                text_file.write(pkgutil.get_data("lambda_toolkit", self.conf.vars['C_LAMBDASTANDARD_FUNC']))
+            self._create_project_folders()
+
+            if 'python' in self.kwargs['runtime']:
+                open(self.project_dir + "/__init__.py", 'a').close()
+                with open(os.path.join(self.project_dir, "index.py"), "w") as text_file:
+                    text_file.write(pkgutil.get_data("lambda_toolkit", self.conf.sett['C_LAMBDASTANDARD_FUNC_PY']))
+            elif 'nodejs' in self.kwargs['runtime']:
+                with open(os.path.join(self.project_dir, "index.js"), "w") as text_file:
+                    text_file.write(pkgutil.get_data("lambda_toolkit", self.conf.sett['C_LAMBDASTANDARD_FUNC_JS']))
+
 
             self.log.info("Project " + self.projectname + " has been created.")
-            self.conf.config.add_section(self.projectname)
-            self.conf.config.set(self.projectname, "deployed", "False")
+            self.conf.projects[self.projectname] = {}
+            self.conf.projects[self.projectname]['deployed'] = False
+            self.conf.projects[self.projectname]['runtime'] = self.kwargs['runtime']
+
+        return self.conf
+
+    def deleteall_project(self):
+        for s in self.projects:
+            self._set_project(s)
+            self.delete_project()
 
         return self.conf
 
     def delete_project(self):
-        if Utils.validate_reserved_sections(self.conf, self.projectname):
-            self.log.critical("Reserved name: " + self.projectname)
-
-        if self.conf.config.has_section(self.projectname):
-            self.conf.config.remove_section(self.projectname)
+        if self.projectname in self.conf.projects:
+            self.conf.projects.pop(self.projectname)
             if not os.path.exists(self.project_dir):
                 self.log.warn("The folder '" + self.project_dir + "' does not exist. Ignoring folder removing.")
             else:
                 rmtree(self.project_dir)
             self.log.info("Project '" + self.projectname + "' has been deleted.")
         else:
-            self.log.critical("Project '" + self.projectname + "' does not exist.")
+            self.log.warn("Project '" + self.projectname + "' does not exist.")
 
         return self.conf
 
     def import_project(self):
+        # TODO: Validate if it is lambda-proxy
         try:
             lambda_function = self.lbs.get_function(FunctionName=self.projectname)
 
-            if self.conf.config.has_section(self.projectname):
+            if self.projectname in self.conf.projects:
                 self.log.info("Project '" + self.projectname + "' already exists in your configuration. Updating.")
-                self.conf.config.set(self.projectname, "deployed", "True")
+                self.conf.projects[self.projectname]['deployed'] = True
             else:
-                self.create_project_folders()
+                self._create_project_folders()
                 open(self.project_dir + "/__init__.py", 'a').close()
-                self.conf.config.add_section(self.projectname)
-                self.conf.config.set(self.projectname, "deployed", "True")
+                self.conf.projects[self.projectname] = {}
+                self.conf.projects[self.projectname]['deployed'] = True
+                self.conf.projects[self.projectname]['runtime'] = lambda_function['Configuration']['Runtime']
                 self.log.info("Project " + self.projectname + " imported.")
 
             urlretrieve(lambda_function['Code']['Location'], self.project_zip_file)
@@ -114,15 +114,13 @@ class Project:
 
         except Exception as e:
             self.log.error(str(e))
-            self.log.critical("The project '" + self.projectname + "' does not exist in AWS environment.")
+            self.log.warn("The project '" + self.projectname + "' does not exist in AWS environment.")
 
         return self.conf
 
-    def deploy_project(self, rolename):
-        rolename = Utils.define_lambda_role(self.conf, rolename)
-
-        if not self.conf.config.has_section(self.projectname):
-            self.log.critical("Project " + self.projectname + " does not exist.")
+    def deploy_project(self):
+        if self.projectname not in self.projects:
+            self.log.critical("Project '" + self.projectname + "' does not exist.")
 
         make_archive(self.project_zip_file_without_ext, "zip", self.project_dir)
 
@@ -142,8 +140,8 @@ class Project:
             else:
                 self.lbs.create_function(
                     FunctionName=self.projectname,
-                    Runtime='python2.7',
-                    Role=rolename,
+                    Runtime=self.conf.projects[self.projectname]['runtime'],
+                    Role=self.kwargs['rolename'],
                     Handler='index.lambda_handler',
                     Description="Lambda project " + self.projectname + " deployed by lambda-proxy",
                     Code={
@@ -152,7 +150,7 @@ class Project:
                 )
                 self.log.info("Lambda project " + self.projectname + " was created and deployed.")
 
-            self.conf.config.set(self.projectname, "deployed", "True")
+            self.conf.projects[self.projectname]['deployed'] = True
 
         except Exception as e:
             self.log.error(str(e))
@@ -163,7 +161,7 @@ class Project:
 
 
     def undeploy_project(self):
-        if not self.conf.config.has_section(self.projectname):
+        if self.projectname not in self.projects:
             self.log.critical("Project '" + self.projectname + "' does not exist.")
 
         try:
@@ -172,11 +170,21 @@ class Project:
         except Exception as e:
             self.log.warn("Project '" + self.projectname + "' is not deployed.")
 
-        self.conf.config.set(self.projectname, "deployed", "False")
+        self.conf.projects[self.projectname]['deployed'] = False
 
         return self.conf
 
-    def create_project_folders(self):
+    def list_project(self):
+        if len(self.projects) > 0:
+            self.log.info("User Projects (Lambda Functions):")
+            for s in self.projects:
+                self.log.info("- User Lambda Project: " + s +
+                              "\t[Deployed: " + str(self.conf.projects[s]["deployed"]) + "]" +
+                              "\t[Runtime: " + self.conf.projects[s]["runtime"] + "]")
+
+        return self.conf
+
+    def _create_project_folders(self):
         if not os.path.exists(self.base_dir):
             self.log.info("Creating the base lambda-toolkit folder: '" + self.base_dir + "'.")
             os.mkdir(self.base_dir)
@@ -192,3 +200,10 @@ class Project:
         if not os.path.exists(self.project_zip_dir):
             self.log.info("Creating the zip lambda-toolkit folder '" + self.project_zip_dir + "'")
             os.mkdir(self.project_zip_dir)
+
+    def _set_project(self, projectname):
+        self.projectname = projectname
+        self.project_dir = os.path.join(self.lambdas_dir, self.projectname + "_" + self.conf.region)
+        self.project_zip_dir = os.path.join(self.lambdas_dir, self.conf.sett['C_LAMBDAS_ZIP_DIR'] + "_" + self.conf.region)
+        self.project_zip_file = os.path.join(self.project_zip_dir, self.projectname + ".zip")
+        self.project_zip_file_without_ext = os.path.join(self.project_zip_dir, self.projectname)

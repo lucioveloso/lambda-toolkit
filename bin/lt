@@ -10,5 +10,6 @@ if os.environ.get('LC_CTYPE', '') == 'UTF-8':
     os.environ['LC_CTYPE'] = 'en_US.UTF-8'
 
 if __name__ == '__main__':
-    from lambda_toolkit.modules.cli import CLI
-    sys.exit(CLI().main())
+
+    import lambda_toolkit.modules.cli
+

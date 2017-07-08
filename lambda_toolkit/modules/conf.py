@@ -7,7 +7,9 @@ from utils import Utils
 from role import Role
 import logger
 import os
-
+import json
+import pkgutil
+import boto3
 
 class Conf:
 
@@ -21,6 +23,11 @@ class Conf:
         self.load_variables()
 
     def save_config(self):
+        file_t = os.path.join(os.path.expanduser('~'), ".lambda-toolkit.json")
+        f = open(file_t, "w")
+        f.write(json.dumps(self.full_data, indent=4))
+        f.close()
+
         f = open(self.config_file, "w+")
         self.config.write(f)
 
@@ -35,8 +42,8 @@ class Conf:
 
     def list_config(self):
         self.log.info("Showing lambda-toolkit configurations:")
-        if "C_DEFAULT_ROLE" in self.vars:
-            self.log.info("- Default Role: " + self.vars['C_DEFAULT_ROLE'])
+        if self.sett.has_key("C_DEFAULT_ROLE"):
+            self.log.info("- Default Role: " + self.sett['C_DEFAULT_ROLE'])
             self.log.info("---------------------------------------------------")
 
         if self.config.has_section(self.vars['C_CONFIG_SQS']):
@@ -76,29 +83,38 @@ class Conf:
         self = Role(self, "bypassvalidator").unset_default_role()
 
     def read_config(self):
+
+        file_t = os.path.join(os.path.expanduser('~'), ".lambda-toolkit.json")
+        self.full_data = None
+        if os.path.isfile(file_t):
+            f = open(file_t, "r")
+            self.full_data = json.loads(f.read())
+            f.close()
+        else:
+            self.log.info("Creating a new config file: '" + self.config_file + "'")
+            f = open(file_t, "w")
+            self.full_data = json.loads(pkgutil.get_data("lambda_toolkit", "templates/.lambda-toolkit.json"))
+            f.write(json.dumps(self.full_data, indent=4))
+            f.close()
+
+        # Global Config
+        self.cli = self.full_data['cli']
+        self.sett = self.full_data['settings']
+
+        # Regional Config
+        self.region = boto3.session.Session().region_name
+        if self.region not in self.full_data:
+            self.full_data[self.region] = {}
+            self.full_data[self.region]['projects'] = {}
+            self.full_data[self.region]['queues'] = {}
+
+        self.queues = self.full_data[self.region]['queues']
+        self.projects = self.full_data[self.region]['projects']
+
+
+
+
+
         self.config = ConfigParser()
         self.config.optionxform = str
-        if not os.path.isfile(self.config_file):
-            self.log.info("Creating a new config file: '" + self.config_file + "'")
-            open(self.config_file, 'a').close()
-            self.config.add_section("settings")
-            self.config.set("settings", "C_BASE_DIR", "\"~/lambda-toolkit/\"")
-            self.config.set("settings", "C_LAMBDAS_DIR", "\"lambdas/\"")
-            self.config.set("settings", "C_LAMBDAS_ZIP_DIR", "\".zips/\"")
-            self.config.set("settings", "C_LAMBDAPROXY_FUNC", "\"templates/lambda-proxy/index.py\"")
-            self.config.set("settings", "C_LAMBDASTANDARD_FUNC", "\"templates/standard-lambda/index.py\"")
-            self.config.set("settings", "C_LAMBDASTANDERD_FUNC_VAR_REPLACE", "\"TEMPLATEQUEUENAME\"")
-            self.config.set("settings", "C_CONFIG_SQS", "\"sqs\"")
-            self.config.set("settings", "C_CONFIG_SQS_QUEUES", "\"queues\"")
-            self.config.set("settings", "C_CONFIG_SETTINGS", "\"settings\"")
-            self.config.set("settings", "C_CONFIG_LAMBDAPROXY", "\"lambda-proxy\"")
-            self.config.set("settings", "C_CONFIG_DEFAULT_ROLE", "\"DEFAULT_ROLE\"")
-            self.config.set("settings", "QUEUE_GETMESSAGE_VISIBILITY_TIMEOUT", 10)
-            self.config.set("settings", "QUEUE_GETMESSAGE_WAITTIMESECONDS", 20)
-            self.config.set("settings", "QUEUE_GETMESSAGE_MAXNUMBEROFMESSAGES", 10)
-            self.config.set("settings", "QUEUE_CREATEQUEUE_VISIBILITY_TIMEOUT", 3)
-            self.config.set("settings", "C_CONFIG_TAIL_TIME_TO_SLEEP", 5)
-            self.config.set("settings", "C_CONFIG_TAIL_TIME_PREVIOUS_LOG", 300000)
-            self.save_config()
-
         self.config.read(self.config_file)
