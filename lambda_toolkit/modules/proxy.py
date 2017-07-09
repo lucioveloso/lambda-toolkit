@@ -13,12 +13,10 @@ import logger
 class Proxy:
     def __init__(self, conf, kwargs):
         self.lbs = boto3.client('lambda')
-        self.log = logger.get_my_logger("ltklambdaproxy")
+        self.log = logger.get_my_logger(self.__class__.__name__)
         self.conf = conf
         self.proxies = self.conf.proxies.keys()
         self.queues = self.conf.queues.keys()
-        self.base_dir = os.path.expanduser(self.conf.sett['C_BASE_DIR'])
-        self.lambdas_dir = os.path.join(self.base_dir, self.conf.sett['C_LAMBDAS_DIR'])
         self.kwargs = kwargs
         if kwargs['proxyname'] is not None:
             self._set_proxyname(kwargs['proxyname'])
@@ -113,6 +111,6 @@ class Proxy:
         self.log.debug("Updating proxy environment to: '" + proxyname + "'")
         self.proxyname = proxyname
         proxyname_region = proxyname + "_" + self.conf.region
-        self.lambdaproxy_dir = os.path.join(self.lambdas_dir, self.proxyname)
-        self.lambdaproxy_zip_dir = os.path.join(self.lambdas_dir, self.conf.sett['C_LAMBDAS_ZIP_DIR'])
+        self.lambdaproxy_dir = os.path.join(self.conf.lambdas_dir, self.proxyname)
+        self.lambdaproxy_zip_dir = os.path.join(self.conf.lambdas_dir, self.conf.sett['C_LAMBDAS_ZIP_DIR'])
         self.lambdaproxy_zip_file = os.path.join(self.lambdaproxy_zip_dir, self.proxyname + ".zip")

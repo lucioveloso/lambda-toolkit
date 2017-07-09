@@ -16,7 +16,6 @@ class Utils:
     def docstring_parameter(*sub):
         def dec(obj):
             obj.__doc__ = pkgutil.get_data("lambda_toolkit", os.path.join(sub[0].sett['C_HELPS_FILES'], obj.func_name + ".txt"))
-            #obj.__doc__ = "HELPAAAAAAA"
             return obj
         return dec
 
@@ -34,13 +33,37 @@ class Utils:
         return opts
 
     @staticmethod
+    def click_list_event_files(conf):
+        opts = ['']
+        for f in os.listdir(conf.invoke_dir_evt):
+            opts.append(f)
+        return opts
+
+
+    @staticmethod
     def click_validate_required_options(ctx,conf):
         if ctx.info_name in conf.cli:
             if ctx.params['action'] in conf.cli[ctx.info_name]['commands']:
                 for check in conf.cli[ctx.info_name]['commands'][ctx.params['action']]:
-                    if ctx.params[check] is None or ctx.params[check] is False:
-                        print("The option '--" + check + "' is required");
-                        exit(1)
+                    if isinstance(check, unicode):
+                        # For single parameters
+                        c = check.replace("-", "_")
+                        if ctx.params[c] is None:
+                            logger.get_my_logger("Utils").critical("The option '--" + check + "' is required");
+                    elif isinstance(check, list):
+                        # At least one parameter in the list should be informed (combined)
+                        find = False
+                        for c in check:
+                            c = c.replace("-", "_")
+                            if c in ctx.params and ctx.params[c] is not None:
+                                find = True
+                                break
+                        if find:
+                            continue
+                        logger.get_my_logger("Utils").critical("One of those parameters should be included: " + ', '.join(map(str, check)))
+                    else:
+                        logger.get_my_logger("Utils").critical("Invalid cli conf file in: " + check)
+
 
     @staticmethod
     def click_list_queues_without_fifo(conf):
@@ -73,8 +96,8 @@ class Utils:
             )
             return value
         except Exception as e:
-            logger.get_my_logger("utils").debug(e)
-            logger.get_my_logger("utils").critical("The role '" + value + "' does not exist.")
+            logger.get_my_logger("Utils").debug(e)
+            logger.get_my_logger("Utils").critical("The role '" + value + "' does not exist.")
 
         return None
 

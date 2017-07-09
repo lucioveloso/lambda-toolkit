@@ -5,7 +5,7 @@ from utils import Utils
 
 class Role:
     def __init__(self, conf, kwargs):
-        self.log = logger.get_my_logger("role")
+        self.log = logger.get_my_logger(self.__class__.__name__)
         self.conf = conf
         self.rolename = kwargs['rolename']
 
