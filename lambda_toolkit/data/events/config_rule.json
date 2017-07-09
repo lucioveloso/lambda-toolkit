@@ -1,0 +1,192 @@
+{
+  "configRuleId": "config-rule-lrmtsa",
+  "version": "1.0",
+  "configRuleName": "test",
+  "configRuleArn": "arn:aws:config:us-east-1:123456789000:config-rule/config-rule-lrmtsa",
+  "invokingEvent": {
+    "configurationItemDiff": null,
+    "configurationItem": {
+      "configurationItemVersion": "1.1",
+      "relatedEvents": [
+        "a3336d74-15a5-48c9-bd72-b72e544e110a"
+      ],
+      "tags": {
+        "aws:cloudformation:stack-name": "awseb-e-fpare4evqj-stack",
+        "aws:autoscaling:groupName": "awseb-e-fpare4evqj-stack-AWSEBAutoScalingGroup-1PT7D8M0ELAIY",
+        "aws:cloudformation:stack-id": "arn:aws:cloudformation:us-east-1:123456789000:stack/awseb-e-fpare4evqj-stack/499b0420-871f-11e5-b799-50fa1dbb2c64",
+        "elasticbeanstalk:environment-name": "test",
+        "aws:cloudformation:logical-id": "AWSEBAutoScalingGroup",
+        "elasticbeanstalk:environment-id": "e-fpare4evqj",
+        "Name": "test"
+      },
+      "relationships": [{
+        "resourceId": "eni-7755cc55",
+        "resourceName": null,
+        "resourceType": "AWS::EC2::NetworkInterface",
+        "name": "Contains Network Interface"
+      }, {
+        "resourceId": "sg-ca9a13ad",
+        "resourceName": null,
+        "resourceType": "AWS::EC2::SecurityGroup",
+        "name": "Is associated with Security Group"
+      }, {
+        "resourceId": "subnet-c75c6ced",
+        "resourceName": null,
+        "resourceType": "AWS::EC2::Subnet",
+        "name": "Is contained in Subnet"
+      }, {
+        "resourceId": "vol-43ac259d",
+        "resourceName": null,
+        "resourceType": "AWS::EC2::Volume",
+        "name": "Is attached to Volume"
+      }, {
+        "resourceId": "vpc-a19f2bcd",
+        "resourceName": null,
+        "resourceType": "AWS::EC2::VPC",
+        "name": "Is contained in Vpc"
+      }],
+      "configuration": {
+        "instanceId": "i-9d8af31e",
+        "imageId": "ami-5578243f",
+        "state": {
+          "code": 16,
+          "name": "running"
+        },
+        "privateDnsName": "ip-172-31-60-10.ec2.internal",
+        "publicDnsName": "ec2-54-173-142-236.compute-1.amazonaws.com",
+        "stateTransitionReason": "",
+        "keyName": "test",
+        "amiLaunchIndex": 0,
+        "productCodes": [],
+        "instanceType": "t2.small",
+        "launchTime": "2016-02-11T20:42:29.000Z",
+        "placement": {
+          "availabilityZone": "us-east-1d",
+          "groupName": "",
+          "tenancy": "default",
+          "hostId": null,
+          "affinity": null
+        },
+        "kernelId": null,
+        "ramdiskId": null,
+        "platform": null,
+        "monitoring": {
+          "state": "enabled"
+        },
+        "subnetId": "subnet-c75c6ced",
+        "vpcId": "vpc-a19f2bcd",
+        "privateIpAddress": "172.31.60.10",
+        "publicIpAddress": "54.173.142.236",
+        "stateReason": null,
+        "architecture": "x86_64",
+        "rootDeviceType": "ebs",
+        "rootDeviceName": "/dev/xvda",
+        "blockDeviceMappings": [{
+          "deviceName": "/dev/xvda",
+          "ebs": {
+            "volumeId": "vol-43ac259d",
+            "status": "attached",
+            "attachTime": "2016-02-11T20:42:33.000Z",
+            "deleteOnTermination": true
+          }
+        }],
+        "virtualizationType": "hvm",
+        "instanceLifecycle": null,
+        "spotInstanceRequestId": null,
+        "clientToken": "5e9a9f6f-47fe-4f3e-b083-6b0da395d229_us-east-1d_1",
+        "tags": [{
+          "key": "aws:cloudformation:stack-name",
+          "value": "awseb-e-fpare4evqj-stack"
+        }, {
+          "key": "aws:autoscaling:groupName",
+          "value": "awseb-e-fpare4evqj-stack-AWSEBAutoScalingGroup-1PT7D8M0ELAIY"
+        }, {
+          "key": "elasticbeanstalk:environment-id",
+          "value": "e-fpare4evqj"
+        }, {
+          "key": "elasticbeanstalk:environment-name",
+          "value": "test"
+        }, {
+          "key": "aws:cloudformation:logical-id",
+          "value": "AWSEBAutoScalingGroup"
+        }, {
+          "key": "aws:cloudformation:stack-id",
+          "value": "arn:aws:cloudformation:us-east-1:123456789000:stack/awseb-e-fpare4evqj-stack/499b0420-871f-11e5-b799-50fa1dbb2c64"
+        }, {
+          "key": "Name",
+          "value": "test"
+        }],
+        "securityGroups": [{
+          "groupName": "awseb-e-fpare4evqj-stack-AWSEBSecurityGroup-1NIQ6P36BTNUR",
+          "groupId": "sg-ca9a13ad"
+        }],
+        "sourceDestCheck": true,
+        "hypervisor": "xen",
+        "networkInterfaces": [{
+          "networkInterfaceId": "eni-7755cc55",
+          "subnetId": "subnet-c75c6ced",
+          "vpcId": "vpc-a19f2bcd",
+          "description": "",
+          "ownerId": "123456789000",
+          "status": "in-use",
+          "macAddress": "12:ff:b2:ba:06:55",
+          "privateIpAddress": "172.31.60.10",
+          "privateDnsName": "ip-172-31-60-10.ec2.internal",
+          "sourceDestCheck": true,
+          "groups": [{
+            "groupName": "awseb-e-fpare4evqj-stack-AWSEBSecurityGroup-1NIQ6P36BTNUR",
+            "groupId": "sg-ca9a13ad"
+          }],
+          "attachment": {
+            "attachmentId": "eni-attach-41f0d5a0",
+            "deviceIndex": 0,
+            "status": "attached",
+            "attachTime": "2016-02-11T20:42:29.000Z",
+            "deleteOnTermination": true
+          },
+          "association": {
+            "publicIp": "54.173.142.236",
+            "publicDnsName": "ec2-54-173-142-236.compute-1.amazonaws.com",
+            "ipOwnerId": "amazon"
+          },
+          "privateIpAddresses": [{
+            "privateIpAddress": "172.31.60.10",
+            "privateDnsName": "ip-172-31-60-10.ec2.internal",
+            "primary": true,
+            "association": {
+              "publicIp": "54.173.142.236",
+              "publicDnsName": "ec2-54-173-142-236.compute-1.amazonaws.com",
+              "ipOwnerId": "amazon"
+            }
+          }]
+        }],
+        "iamInstanceProfile": {
+          "arn": "arn:aws:iam::123456789000:instance-profile/aws-elasticbeanstalk-ec2-role",
+          "id": "AIPAJVHIC3NYNK2GWV3XK"
+        },
+        "ebsOptimized": false,
+        "sriovNetSupport": null
+      },
+      "configurationItemCaptureTime": "2016-02-11T20:46:47.863Z",
+      "configurationStateId": 1,
+      "awsAccountId": "123456789000",
+      "configurationItemStatus": "ResourceDiscovered",
+      "resourceType": "AWS::EC2::Instance",
+      "resourceId": "i-9d8af31e",
+      "resourceName": null,
+      "ARN": "arn:aws:ec2:us-east-1:123456789000:instance/i-9d8af31e",
+      "awsRegion": "us-east-1",
+      "availabilityZone": "us-east-1d",
+      "configurationStateMd5Hash": "b748dcf5f848f96efcea6dc5af00cb08",
+      "resourceCreationTime": "2016-02-11T20:42:29.000Z"
+    },
+    "notificationCreationTime": "2016-03-29T02:02:02.777Z",
+    "messageType": "ConfigurationItemChangeNotification",
+    "recordVersion": "1.2"
+  },
+  "resultToken": "eyJlbmNyeXB0ZWREYXRhIjpbODksMTA0LDIxLDc0LC0zNyw5OCwtNzcsLTY2LDk0LDEyMiwtMTEzLDg1LDg4LDEyMCwtMTE0LC02NSwxMjMsLTgwLDgyLC03MSwzMywyLC02MiwtMTE0LDI4LC01OSwtMTIxLDQ5LDEzLC01NCwxMDMsNzIsLTExLDEzLC04MCwtMjQsNDIsODUsNTgsNTIsLTExOCwtOTYsMTMsLTgxLC0xMDgsLTIsLTEyNywzMywtOTEsMiwtMiwtNzEsNCwtNjksLTM5LC00NywyMSwtMTAxLC0xMyw5NCw1Niw5NSw3MSwxMjYsMTEzLC0xMCwtMzcsLTc2LDI2LDAsMTAzLC03LC0zNiwtMjQsMTE4LC05MCwxMjMsMzIsNjcsLTExMiwtOTksMTE4LDc0LDY5LDgyLC0xMDcsMSwxMDgsNiw4MCwtNywxMDcsOTEsNTQsLTg2LC0xMDMsLTgsLTk5LC0xOCwtNTMsLTc2LC02NCwtMTEwLDkxLC0xMTQsMTE3LC00MCwtNjIsMjEsODMsNDYsMzEsNTUsOSwtODksLTEyMSwtOTUsLTExMCwtMzEsNjYsLTkzLDIyLC04Niw4OSwyMywyNiw3MywxMjQsNTYsNTIsLTQwLC02MSwyOSwtMzgsOSwtNzMsNDEsMTE3LDc0LC01OCwxMTUsNDIsLTE3LDExNiwtNTIsLTc4LC0xMTEsLTEwOCwxMTMsLTIwLC04MiwxMDYsMTEyLC04MCwxNSwtMzMsMTAyLDIzLDYxLC0xMiwtMTI3LC0yMiwtMzgsMTExLC0zNSwtMTcsLTE0LC04MiwtMjYsNDIsLTksLTEyMCwtMTA3LC0xLDIwLC0zMyw4MiwtODEsNDEsNzUsNjAsNTcsLTExOCwyNyw1OCw3NSwtOTIsLTMyLDk1LDgzLC0xNCwtOTAsMTIyLC0xMTQsNiwtMTExLDEzLDI1LDEwMyw3MywtMzIsOTQsLTk2LDUwLDExOSwtNTksLTExNCwtMTIxLDU1LC0xMTIsMyw3MywtMzAsLTI3LC0yLDk2LC04NCw4MiwzNSw3LDM3LC02NSwxOSwxOCwtOTgsLTEyNCwtMTE2LC0zLDEzLC0xMjgsNjIsMTEyLC0yMSw5OSw3OCw3MywtMjMsMjQsOTcsMzIsNjQsLTkwLC00NSwtNjAsLTU3LC01MiwtNDIsODgsMTIwLDgwLDQ5LDc1LC00LC01NSwtNTEsLTExNywyMywtMjcsMTI3LC0xMTUsLTQxLDEwMiwtNzgsLTEwNCw3OCwxMTksMTEyLDEwMywtMTE3LDY3LC02NCw0MywwLDQ1LC04MCwtMTksLTQ0LC05MywtNyw1NywtMTI2LDYwLDg4LC00NCwtNzEsODAsLTYsMzgsLTc4LC0xNSwzNiwtMTYsMjYsMCwtNzcsNjgsLTYsNDQsNywxMywxMjQsNTMsMjksLTQzLC0xMjEsMjcsOTcsMTIzLDExMSwzMCwxMCw0NSwtNTYsLTc2LDcsNDUsLTEyLDI3LC00NCwtMTA3LDc3LDQ1LC0xMDEsMzMsNzYsLTQ1LDExMiwtMTI1LDQ5LDc4LDgyLC04LDMxLC0xMjcsMTE3LDQzLDc3LDEyMSw5M10sIm1hdGVyaWFsU2V0U2VyaWFsTnVtYmVyIjoxLCJpdlBhcmFtZXRlclNwZWMiOnsiaXYiOlszMCw5NiwtNSw5NywtMjcsLTEwMywxMTYsLTgwLC0xMywtMTA4LC01MywtNDksMiw1MiwtNTAsMjldfX0=",
+  "eventLeftScope": "False",
+  "ruleParameters": "{}",
+  "executionRoleArn": "arn:aws:iam::123456789000:role/config-role",
+  "accountId": "123456789000"
+}

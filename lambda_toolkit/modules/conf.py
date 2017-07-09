@@ -37,7 +37,7 @@ class Conf:
         else:
             self.log.info("Creating a new config file: '" + self.config_file + "'")
             f = open(self.config_file, "w")
-            self.full_data = json.loads(pkgutil.get_data("lambda_toolkit", "templates/lambda-toolkit.json"))
+            self.full_data = json.loads(pkgutil.get_data("lambda_toolkit", "data/lambda-toolkit.json"))
             f.write(json.dumps(self.full_data, indent=4))
             f.close()
 

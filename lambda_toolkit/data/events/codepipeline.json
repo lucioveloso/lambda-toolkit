@@ -1,0 +1,30 @@
+{
+  "CodePipeline.job": {
+    "data": {
+      "artifactCredentials": {
+        "secretAccessKey": "shhhh_its_a_secret",
+        "accessKeyId": "keys_to_the_whip",
+        "sessionToken": "some_really_long_string"
+      },
+      "actionConfiguration": {
+        "configuration": {
+          "FunctionName": "gucci__main__"
+        }
+      },
+      "inputArtifacts": [{
+        "location": {
+          "type": "S3",
+          "s3Location": {
+            "objectKey": "pipeline/MyApp/random.zip",
+            "bucketName": "codepipeline-us-east-1-123456789000"
+          }
+        },
+        "name": "MyApp",
+        "revision": null
+      }],
+      "outputArtifacts": []
+    },
+    "id": "7c878283-f6d8-42b8-865c-d43a949cd902",
+    "accountId": "123456789000"
+  }
+}

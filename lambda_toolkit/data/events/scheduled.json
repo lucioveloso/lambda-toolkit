@@ -1,0 +1,11 @@
+{
+  "account": "123456789000",
+  "region": "us-east-1",
+  "detail": {},
+  "detail-type": "Scheduled Event",
+  "source": "aws.events",
+  "version": "0",
+  "time": "2016-03-29T00:39:31Z",
+  "id": "c714fbf3-d4ca-443d-a0f6-b1b1472d0291",
+  "resources": ["arn:aws:events:us-east-1:123456789000:rule/Test"]
+}

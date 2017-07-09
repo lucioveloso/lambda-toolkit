@@ -51,15 +51,15 @@
     "settings": {
         "C_LAMBDAS_DIR": "lambdas/",
         "C_LAMBDAS_ZIP_DIR": ".zips",
-        "C_LAMBDAPROXY_FUNC": "templates/lambda-proxy/index.py",
-        "C_LAMBDASTANDARD_FUNC_PY": "templates/standard-lambda/index.py",
-        "C_LAMBDASTANDARD_FUNC_JS": "templates/standard-lambda/index.js",
+        "C_LAMBDAPROXY_FUNC": "data/lambda-proxy/index.py",
+        "C_LAMBDASTANDARD_FUNC_PY": "data/standard-lambda/index.py",
+        "C_LAMBDASTANDARD_FUNC_JS": "data/standard-lambda/index.js",
         "QUEUE_CREATEQUEUE_VISIBILITY_TIMEOUT": 3,
         "C_LAMBDASTANDERD_FUNC_VAR_REPLACE": "TEMPLATEQUEUENAME",
         "QUEUE_GETMESSAGE_VISIBILITY_TIMEOUT": 10,
         "QUEUE_GETMESSAGE_MAXNUMBEROFMESSAGES": 10,
         "C_BASE_DIR": "~/lambda-toolkit/",
         "QUEUE_GETMESSAGE_WAITTIMESECONDS": 20,
-        "C_HELPS_FILES": "templates/helps/"
+        "C_HELPS_FILES": "data/helps/"
     }
 }
