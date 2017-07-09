@@ -1,1 +1,1 @@
-recursive-include lambda_toolkit/templates/ *
+recursive-include lambda_toolkit/data/ *

@@ -1,0 +1,14 @@
+{
+  "account": "123456789000",
+  "region": "us-east-1",
+  "detail": {
+    "state": "terminated",
+    "instance-id": "i-99999999"
+  },
+  "detail-type": "EC2 Instance State-change Notification",
+  "source": "aws.ec2",
+  "version": "0",
+  "time": "2016-01-01T00:00:00",
+  "id": "f4e480cb-307b-46ed-b290-07a047534ac1",
+  "resources": ["arn:aws:ec2:us-east-1:123456789000:instance/i-99999999"]
+}

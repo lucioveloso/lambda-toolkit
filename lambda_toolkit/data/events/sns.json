@@ -1,0 +1,28 @@
+{
+  "Records": [{
+    "EventVersion": "1.0",
+    "EventSubscriptionArn": "arn:aws:sns:us-east-1:123456789000:Test:4f43f32f-0e4f-4b14-ae25-df03b93652f9",
+    "EventSource": "aws:sns",
+    "Sns": {
+      "SignatureVersion": "1",
+      "Timestamp": "2016-01-25T22:35:26.578Z",
+      "Signature": "ZUZZ8wdt9pD7dj1GObPvoi4ARbMouZfhseuYV316HRaHqZkNdBFBjDQvYtRhXmH0+hF0CcJxxw9fa7oPjBOeYrSeKwYAoDP8CXvD7PxA4S3x2Md1pzHNbNB36cNJ5zhAloFF1T0ifG3fB12CnFhwK+xT7C5VvD0fwswzToaF6YJVMLOMAtTAQc6Ccud0gRF6S4IgwFqxBwsnm1VM9pswosdn2xobVwE+H+nx+dJ+G+7UEsaDerv4K/h8Cl+xy/cDEL7eHhXJuwIpEUM+ENLRr7Py3P8x6EV/09OqZrtbC+xjQJrY90laPrvu1B1gScBiLMbUA7lGPU4UINYMgA/icA==",
+      "SigningCertUrl": "https://sns.us-east-1.amazonaws.com/SimpleNotificationService-bb750dd426d95ee9390147a5624348ee.pem",
+      "MessageId": "5e2abd9f-e569-5084-9233-f2bf4007c295",
+      "Message": {
+        "AutoScalingGroupName": "some_asg",
+        "Service": "AWS Auto Scaling",
+        "Time": "2016-01-01T00:00:00Z",
+        "AccountId": "123456789000 ",
+        "Event": "autoscaling: TEST_NOTIFICATION",
+        "RequestId": "ee09301f-c3b3-11e5-94d9-3b439ffa9270",
+        "AutoScalingGroupARN": "arn:aws:autoscaling:us-east-1:123456789000:autoScalingGroup:f9c94272-5d4a-47f4-98fd-b45e82c65a89:autoScalingGroupName/some_asg"
+      },
+      "MessageAttributes": {},
+      "Type": "Notification",
+      "UnsubscribeUrl": "https://sns.us-east-1.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:us-east-1:123456789000:test:4f43f32f-0e4f-4b14-ae25-df03b93652f9",
+      "TopicArn": "arn:aws:sns:us-east-1:123456789000:Test",
+      "Subject": "Auto Scaling: test notification"
+    }
+  }]
+}

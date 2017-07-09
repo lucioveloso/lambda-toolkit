@@ -1,0 +1,16 @@
+{
+  "StackId": "arn:aws:cloudformation:us-east-1:123456789000:stack/Test/e97df1b0-92d6-11e5-b0f6-50d501114c2a",
+  "ResponseURL": "http://pre-signed-S3-url-for-response",
+  "ResourceProperties": {
+    "StackName": "stack-name",
+    "List": [
+      "1",
+      "2",
+      "3"
+    ]
+  },
+  "RequestType": "Create",
+  "ResourceType": "Custom::TestResource",
+  "RequestId": "unique id for this create request",
+  "LogicalResourceId": "MyTestResource"
+}
