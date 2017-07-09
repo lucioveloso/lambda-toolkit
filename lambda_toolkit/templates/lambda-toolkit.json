@@ -1,5 +1,10 @@
 {
     "cli": {
+        "receiver": {
+          "commands": {
+            "collect": [ "projectname", "sqsname" ]
+          }
+        },
         "role": {
           "commands": {
             "set-default": [ "rolename" ],
