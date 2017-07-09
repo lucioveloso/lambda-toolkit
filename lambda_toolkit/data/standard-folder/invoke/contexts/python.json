@@ -1,0 +1,11 @@
+{
+  "aws_request_id": "11111111-1111-1111-1111-111111111111",
+  "log_stream_name": "2017/07/09/[$LATEST]log_stream_name_id",
+  "invoked_function_arn": "arn:aws:lambda:region:123456789000:function:FUNC_NAME",
+  "client_context": null,
+  "log_group_name": "/aws/lambda/log_group_name",
+  "function_name": "FUNC_NAME",
+  "function_version": "$LATEST",
+  "identity": "",
+  "memory_limit_in_mb": "128"
+}

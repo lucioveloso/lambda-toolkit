@@ -2,7 +2,8 @@
     "cli": {
         "invoke": {
           "commands": {
-            "local": [ "projectname" ]
+            "local": [ "event-file", "projectname" ],
+            "remote": [ "event-file", [ "projectname", "proxyname"]]
           }
         },
         "receiver": {
@@ -35,6 +36,7 @@
         }, 
         "project": {
           "commands": {
+            "list-aws": [],
             "undeploy": [ "projectname" ],
             "deploy": [ "projectname", "rolename" ],
             "create": [ "projectname" ],
@@ -50,10 +52,17 @@
     }, 
     "settings": {
         "C_LAMBDAS_DIR": "lambdas/",
+        "C_STANDARD_FOLDER_DIR": "data/standard-folder/",
         "C_LAMBDAS_ZIP_DIR": ".zips",
         "C_LAMBDAPROXY_FUNC": "data/lambda-proxy/index.py",
         "C_LAMBDASTANDARD_FUNC_PY": "data/standard-lambda/index.py",
         "C_LAMBDASTANDARD_FUNC_JS": "data/standard-lambda/index.js",
+        "C_LAMBDACONTEXT_FUNC_PY": "data/contexts/",
+        "C_LAMBDAEVENTS_FUNC": "data/events/",
+        "C_INVOKE_DIR": "invoke/",
+        "C_INVOKE_DIR_EVT": "invoke/events/",
+        "C_INVOKE_DIR_CTX": "invoke/contexts/",
+        "C_INVOKE_CTX_FILE": "python.json",
         "QUEUE_CREATEQUEUE_VISIBILITY_TIMEOUT": 3,
         "C_LAMBDASTANDERD_FUNC_VAR_REPLACE": "TEMPLATEQUEUENAME",
         "QUEUE_GETMESSAGE_VISIBILITY_TIMEOUT": 10,

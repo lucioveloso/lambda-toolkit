@@ -15,17 +15,14 @@ import logger
 class Project:
     def __init__(self, conf, kwargs):
         self.lbs = boto3.client('lambda')
-        self.log = logger.get_my_logger("project")
+        self.log = logger.get_my_logger(self.__class__.__name__)
         self.conf = conf
         self.projects = self.conf.projects.keys()
-
-        self.base_dir = os.path.expanduser(self.conf.sett['C_BASE_DIR'])
-        self.lambdas_dir = os.path.join(self.base_dir, self.conf.sett['C_LAMBDAS_DIR'])
         self.kwargs = kwargs
         if kwargs['projectname'] is not None:
             self._set_project(kwargs['projectname'])
 
-    def importall_project(self):
+    def import_all_project(self):
         lambdas = self.lbs.list_functions()
         for mylb in lambdas['Functions']:
             self._set_project(mylb['FunctionName'])
@@ -64,7 +61,8 @@ class Project:
                 with open(os.path.join(self.project_dir, "index.js"), "w") as text_file:
                     text_file.write(pkgutil.get_data("lambda_toolkit", self.conf.sett['C_LAMBDASTANDARD_FUNC_JS']))
 
-            self.log.info("Project " + self.projectname + " has been created.")
+            self.log.info("Project '" + self.projectname + "' "
+                          "[" + self.kwargs['runtime'] + "] has been created.")
             self.conf.projects[self.projectname] = {}
             self.conf.projects[self.projectname]['deployed'] = False
             self.conf.projects[self.projectname]['runtime'] = self.kwargs['runtime']
@@ -160,7 +158,7 @@ class Project:
             self.log.error(str(e))
             self.log.critical("Failed to deploy the lambda project.")
 
-        os.remove(self.project_zip_file)
+        #os.remove(self.project_zip_file)
         return self.conf
 
     def undeploy_project(self):
@@ -177,25 +175,31 @@ class Project:
 
         return self.conf
 
+    def list_aws_project(self):
+        lambdas = self.lbs.list_functions()
+        for mylb in lambdas['Functions']:
+            imported = False
+            if mylb['FunctionName'] in self.projects:
+                print("imported")
+                imported = True
+
+            self.log.info("- User Lambda Project: " + mylb['FunctionName'] +
+                          "\t[Runtime: " + mylb['Runtime'] + "]"
+                          "\t[Imported: " + str(imported) + "]")
+
+        return self.conf
+
     def list_project(self):
         if len(self.projects) > 0:
             self.log.info("User Projects (Lambda Functions):")
-            for s in self.projects:
-                self.log.info("- User Lambda Project: " + s +
-                              "\t[Deployed: " + str(self.conf.projects[s]["deployed"]) + "]" +
-                              "\t[Runtime: " + self.conf.projects[s]["runtime"] + "]")
+            for p in self.projects:
+                self.log.info("- User Lambda Project: " + p +
+                              "\t[Deployed: " + str(self.conf.projects[p]["deployed"]) + "]" +
+                              "\t[Runtime: " + self.conf.projects[p]["runtime"] + "]")
 
         return self.conf
 
     def _create_project_folders(self):
-        if not os.path.exists(self.base_dir):
-            self.log.info("Creating the base lambda-toolkit folder: '" + self.base_dir + "'.")
-            os.mkdir(self.base_dir)
-
-        if not os.path.exists(self.lambdas_dir):
-            self.log.info("Creating the lambda lambda-toolkit folder: '" + self.lambdas_dir + "'.")
-            os.mkdir(self.lambdas_dir)
-
         if not os.path.exists(self.project_dir):
             self.log.info("Creating the project lambda-toolkit folder '" + self.project_dir + "'")
             os.mkdir(self.project_dir)
@@ -204,12 +208,22 @@ class Project:
             self.log.info("Creating the zip lambda-toolkit folder '" + self.project_zip_dir + "'")
             os.mkdir(self.project_zip_dir)
 
+
     def _set_project(self, projectname):
         self.log.debug("Updating project environment to: '" + projectname + "'")
         self.projectname = projectname
         projectname_region = projectname + "_" + self.conf.region
-        self.project_dir = os.path.join(self.lambdas_dir, projectname_region)
-        self.project_zip_dir = os.path.join(self.lambdas_dir,
+        self.project_dir = os.path.join(self.conf.lambdas_dir, projectname_region)
+        self.project_zip_dir = os.path.join(self.conf.lambdas_dir,
                                             self.conf.sett['C_LAMBDAS_ZIP_DIR'] + "_" + self.conf.region)
         self.project_zip_file = os.path.join(self.project_zip_dir, projectname_region + ".zip")
         self.project_zip_file_without_ext = os.path.join(self.project_zip_dir, projectname_region)
+
+# TODO -> ZIP (ALL / SPECIFIC) (local / remote)
+# TODO -> SYNC ONLY STATUS (ALL / SPECIFIC)
+# TODO -> SYNC FILES -> OVERWRITE LOCAL OR REMOTE (same that import and deploy?)
+# TODO -> COMPARE MD5 (ALL / SPECIFIC)
+# TODO -> IMPORT/DEPLOY WITH OVERWRITE OPTION
+# TODO -> import from a .zip (only local, only deploy, both)
+# TODO -> Change runtime
+# TODO -> Copy project among regions

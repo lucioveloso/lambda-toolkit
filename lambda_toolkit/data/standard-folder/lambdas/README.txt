@@ -1,0 +1,1 @@
+This folder stores your lambda functions projects.

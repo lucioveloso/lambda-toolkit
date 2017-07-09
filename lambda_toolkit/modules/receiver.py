@@ -3,17 +3,16 @@
 import json
 import os
 import sys
-from collections import namedtuple
 
 import boto3
 
 import logger
-from utils import Utils
+from lambda_toolkit.modules.lambdacontext import LambdaContext
 
 
 class Receiver:
     def __init__(self, conf, kwargs):
-        self.log = logger.get_my_logger("receiver")
+        self.log = logger.get_my_logger(self.__class__.__name__)
         self.conf = conf
         self.sqsname = kwargs['sqsname']
         self.projectname = kwargs['projectname']
@@ -25,7 +24,7 @@ class Receiver:
         self.log.info("Importing project " + self.projectname)
         pp = os.path.join(os.path.expanduser(self.conf.sett['C_BASE_DIR']), self.conf.sett['C_LAMBDAS_DIR'],
                           self.projectname + "_" + self.conf.region)
-        print(pp)
+        self.log.debug("Using project dir: " + pp)
         sys.path.append(pp)
         a = __import__("index")
         func = getattr(a, "lambda_handler")
@@ -43,8 +42,7 @@ class Receiver:
                 self.log.info("=======================================")
                 self.log.info("* New message. Sending to " + self.projectname)
 
-                if func(jsonmsg["event"], json.loads(json.dumps(jsonmsg["context"]),
-                                                     object_hook=lambda d: namedtuple('X', d.keys())(*d.values()))):
+                if func(jsonmsg["event"], LambdaContext(jsonmsg["context"])):
                     try:
                         msg.delete()
                         self.log.info("* Message deleted.")

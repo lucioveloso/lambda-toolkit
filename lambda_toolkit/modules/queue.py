@@ -4,11 +4,11 @@ import boto3
 
 import logger
 
-
+# TODO _ Maybe it can be another queue-toolkit
 class Queue:
     def __init__(self, conf, kwargs):
         self.sqs = boto3.client('sqs')
-        self.log = logger.get_my_logger("queue")
+        self.log = logger.get_my_logger(self.__class__.__name__)
         self.conf = conf
         self.queues = self.conf.queues.keys()
         self.sqsname = kwargs['sqsname']

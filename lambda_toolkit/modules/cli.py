@@ -6,6 +6,7 @@ import click
 from lambda_toolkit import __version__
 import sys
 
+# TODO: How about a shell to keep session (force sync on load)
 def execute_cli(args):
     Utils.click_validate_required_options(click.get_current_context(), conf)
     module = click.get_current_context().info_name
@@ -68,6 +69,17 @@ def role(**kwargs):
 @click.option( '--projectname', '-p', help="Define the project.", type=click.Choice(conf.projects.keys()))
 @Utils.docstring_parameter(conf)
 def receiver(**kwargs):
+    execute_cli(kwargs)
+
+@cli.command()
+@click.argument('action', required=True, type=click.Choice(Utils.click_get_command_choice("invoke", conf)))
+@Utils.docstring_parameter(conf)
+@click.option( '--projectname', '-p', help="Define the project.", type=click.Choice(conf.projects.keys()))
+@click.option( '--event-file', '-f', help="Define a file.",
+               type=click.Choice(Utils.click_list_event_files(conf)))
+@click.option( '--projectname', '-p', help="Define the project.", type=click.Choice(conf.projects.keys()))
+@click.option( '--proxyname', '-pp', help="Define the proxy.", type=click.Choice(conf.proxies.keys()))
+def invoke(**kwargs):
     execute_cli(kwargs)
 
 @cli.command()
