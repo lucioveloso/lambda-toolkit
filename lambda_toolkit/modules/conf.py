@@ -19,7 +19,8 @@ class Conf:
     def _init_confs(self):
         confs = ['projects', 'queues', 'proxies']
         for c in confs:
-            self.full_data[self.region][c] = {}
+            if c not in self.full_data[self.region]:
+                self.full_data[self.region][c] = {}
             setattr(self, c, self.full_data[self.region][c])
 
     def save_config(self):

@@ -62,6 +62,15 @@ def role(**kwargs):
     execute_cli(kwargs)
 
 @cli.command()
+@click.argument('action', required=True, type=click.Choice(Utils.click_get_command_choice("receiver", conf)))
+@click.option('--sqsname', '-q', callback=Utils.click_append_fifo_in_queue, help="Define the queue name.",
+              type=click.Choice(Utils.click_list_queues_without_fifo(conf)))
+@click.option( '--projectname', '-p', help="Define the project.", type=click.Choice(conf.projects.keys()))
+@Utils.docstring_parameter(conf)
+def receiver(**kwargs):
+    execute_cli(kwargs)
+
+@cli.command()
 def tail(**kwargs):
     """Forward to tail-toolkit"""
     pass
