@@ -30,9 +30,7 @@ class Invoke:
             a = __import__("index")
             func = getattr(a, "lambda_handler")
 
-            ctx = LambdaContext(pkgutil.get_data("lambda_toolkit", os.path.join
-                  (self.conf.sett['C_LAMBDACONTEXT_FUNC_PY'], self.conf.sett['C_INVOKE_CTX_FILE'])))
-
+            ctx = open(os.path.join(self.conf.invoke_dir_ctx, self.conf.sett['C_INVOKE_CTX_FILE']))
             func(self._get_event(), ctx)
 
         return self.conf
