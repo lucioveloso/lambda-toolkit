@@ -18,7 +18,7 @@ class Proxy:
         self.proxies = self.conf.proxies.keys()
         self.queues = self.conf.queues.keys()
         self.kwargs = kwargs
-        if kwargs['proxyname'] is not None:
+        if 'proxyname' in kwargs and kwargs['proxyname'] is not None:
             self._set_proxyname(kwargs['proxyname'])
 
     def list_proxy(self):

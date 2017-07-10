@@ -87,5 +87,17 @@ def tail(**kwargs):
     """Forward to tail-toolkit"""
     pass
 
+@cli.command()
+def list(**kwargs):
+    """List all configuration"""
+    modules = ['project', 'queue', 'proxy']
+
+    for m in modules:
+        myclass = __import__("lambda_toolkit.modules." + m)
+        args = {}
+        args['action'] = "list"
+        clazz = getattr(getattr(myclass.modules, m), m.title())
+        getattr(clazz(conf, args), args['action'].replace("-", "_") + "_" + m)().save_config()
+
 print("Initializing lambda-toolkit CLI (v" + __version__ + ") - Region: " + conf.region)
 cli()

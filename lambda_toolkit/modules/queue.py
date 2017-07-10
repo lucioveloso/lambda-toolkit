@@ -11,7 +11,8 @@ class Queue:
         self.log = logger.get_my_logger(self.__class__.__name__)
         self.conf = conf
         self.queues = self.conf.queues.keys()
-        self.sqsname = kwargs['sqsname']
+        if 'sqsname' in kwargs and kwargs['sqsname'] is not None:
+            self.sqsname = kwargs['sqsname']
 
     def create_queue(self):
         if self.sqsname in self.conf.queues:

@@ -19,7 +19,7 @@ class Project:
         self.conf = conf
         self.projects = self.conf.projects.keys()
         self.kwargs = kwargs
-        if kwargs['projectname'] is not None:
+        if 'projectname' in kwargs and kwargs['projectname'] is not None:
             self._set_project(kwargs['projectname'])
 
     def import_all_project(self):

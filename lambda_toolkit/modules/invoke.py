@@ -36,7 +36,7 @@ class Invoke:
         return self.conf
 
     def remote_invoke(self):
-        if "projectname" in self.kwargs:
+        if "projectname" in self.kwargs and self.kwargs['projectname'] is not None:
             invoke_lambda = self.kwargs['projectname']
             if self.conf.projects[invoke_lambda]['deployed'] == False:
                 self.log.critical("Project '" + invoke_lambda + "' is not deployed.")
