@@ -52,7 +52,7 @@
     }, 
     "settings": {
         "C_LAMBDAS_DIR": "lambdas/",
-        "C_STANDARD_FOLDER_DIR": "data/standard-folder/",
+        "C_STANDARD_FOLDER_DIR": "data/standard-folder",
         "C_LAMBDAS_ZIP_DIR": ".zips",
         "C_LAMBDAPROXY_FUNC": "data/lambda-proxy/index.py",
         "C_LAMBDASTANDARD_FUNC_PY": "data/standard-lambda/index.py",
