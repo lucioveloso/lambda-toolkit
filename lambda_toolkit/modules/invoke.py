@@ -12,7 +12,7 @@ from lambdacontext import LambdaContext
 
 class Invoke:
     def __init__(self, conf, kwargs):
-        self.lbs = boto3.client('lambda')
+        self.lbs = conf.get_boto3("lambda")
         self.log = logger.get_my_logger(self.__class__.__name__)
         self.conf = conf
         self.kwargs = kwargs
@@ -30,13 +30,15 @@ class Invoke:
             a = __import__("index")
             func = getattr(a, "lambda_handler")
 
-            ctx = open(os.path.join(self.conf.invoke_dir_ctx, self.conf.sett['C_INVOKE_CTX_FILE']))
+            ctx = LambdaContext(json.loads(open(os.path.join(self.conf.invoke_dir_ctx, self.conf.sett['C_INVOKE_CTX_FILE'])).read()))
+            #ctx = LambdaContext(json.loads(pkgutil.get_data("lambda_toolkit", "data/standard-folder/invoke/contexts/python.json")))
+
             func(self._get_event(), ctx)
 
         return self.conf
 
     def remote_invoke(self):
-        if "projectname" in self.kwargs:
+        if "projectname" in self.kwargs and self.kwargs['projectname'] is not None:
             invoke_lambda = self.kwargs['projectname']
             if self.conf.projects[invoke_lambda]['deployed'] == False:
                 self.log.critical("Project '" + invoke_lambda + "' is not deployed.")

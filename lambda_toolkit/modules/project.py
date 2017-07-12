@@ -14,12 +14,12 @@ import logger
 
 class Project:
     def __init__(self, conf, kwargs):
-        self.lbs = boto3.client('lambda')
+        self.lbs = conf.get_boto3("lambda")
         self.log = logger.get_my_logger(self.__class__.__name__)
         self.conf = conf
         self.projects = self.conf.projects.keys()
         self.kwargs = kwargs
-        if kwargs['projectname'] is not None:
+        if 'projectname' in kwargs and kwargs['projectname'] is not None:
             self._set_project(kwargs['projectname'])
 
     def import_all_project(self):
@@ -177,15 +177,17 @@ class Project:
 
     def list_aws_project(self):
         lambdas = self.lbs.list_functions()
+        self.log.info("AWS Projects (Lambda Functions):")
         for mylb in lambdas['Functions']:
             imported = False
             if mylb['FunctionName'] in self.projects:
-                print("imported")
                 imported = True
-
-            self.log.info("- User Lambda Project: " + mylb['FunctionName'] +
-                          "\t[Runtime: " + mylb['Runtime'] + "]"
-                          "\t[Imported: " + str(imported) + "]")
+            self.log.info('{0: <{1}}'.format("- Project:", 15) +
+                          '{0: <{1}}'.format(mylb['FunctionName'], 25) +
+                          '{0: <{1}}'.format("Imported:", 10) +
+                          '{0: <{1}}'.format(str(imported), 25) +
+                          '{0: <{1}}'.format("Runtime:", 10) +
+                          mylb['Runtime'])
 
         return self.conf
 
@@ -193,9 +195,12 @@ class Project:
         if len(self.projects) > 0:
             self.log.info("User Projects (Lambda Functions):")
             for p in self.projects:
-                self.log.info("- User Lambda Project: " + p +
-                              "\t[Deployed: " + str(self.conf.projects[p]["deployed"]) + "]" +
-                              "\t[Runtime: " + self.conf.projects[p]["runtime"] + "]")
+                self.log.info('{0: <{1}}'.format("- Project:", 15) +
+                              '{0: <{1}}'.format(p, 25) +
+                              '{0: <{1}}'.format("Deployed:", 10) +
+                              '{0: <{1}}'.format(str(self.conf.projects[p]["deployed"]), 25) +
+                              '{0: <{1}}'.format("Runtime:", 10) +
+                              self.conf.projects[p]["runtime"])
 
         return self.conf
 

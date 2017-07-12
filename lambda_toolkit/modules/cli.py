@@ -2,11 +2,19 @@
 
 from conf import Conf
 from utils import Utils
+import logger
 import click
 from lambda_toolkit import __version__
 import sys
 
-# TODO: How about a shell to keep session (force sync on load)
+
+if len(sys.argv) > 1:
+    if sys.argv[1] == "tail":
+        # External modudle
+        import tail_toolkit.modules.cli
+else:
+    sys.argv[0] == "--help"
+
 def execute_cli(args):
     Utils.click_validate_required_options(click.get_current_context(), conf)
     module = click.get_current_context().info_name
@@ -14,14 +22,14 @@ def execute_cli(args):
     clazz = getattr(getattr(myclass.modules, module), module.title())
     getattr(clazz(conf, args), args['action'].replace("-", "_") + "_" + module)().save_config()
 
+conf = Conf()
+
 @click.group()
+@click.option('--debug/--no-debug', default=False)
 def cli(**kwargs):
     pass
 
-if len(sys.argv) > 1 and sys.argv[1] == "tail":
-    import tail_toolkit.modules.cli
 
-conf = Conf()
 
 @cli.command()
 @click.argument('action', required=True, type=click.Choice(Utils.click_get_command_choice("queue", conf)))
@@ -56,7 +64,7 @@ def project(**kwargs):
 
 @cli.command()
 @click.argument('action', required=True, type=click.Choice(Utils.click_get_command_choice("role", conf)))
-@click.option('--rolename', '-r', default=Utils.get_default_role(conf),
+@click.option('--rolename',
               help="Define the role or try to get the default.")
 @Utils.docstring_parameter(conf)
 def role(**kwargs):
@@ -77,7 +85,6 @@ def receiver(**kwargs):
 @click.option( '--projectname', '-p', help="Define the project.", type=click.Choice(conf.projects.keys()))
 @click.option( '--event-file', '-f', help="Define a file.",
                type=click.Choice(Utils.click_list_event_files(conf)))
-@click.option( '--projectname', '-p', help="Define the project.", type=click.Choice(conf.projects.keys()))
 @click.option( '--proxyname', '-pp', help="Define the proxy.", type=click.Choice(conf.proxies.keys()))
 def invoke(**kwargs):
     execute_cli(kwargs)
@@ -87,5 +94,19 @@ def tail(**kwargs):
     """Forward to tail-toolkit"""
     pass
 
-print("Initializing lambda-toolkit CLI (v" + __version__ + ") - Region: " + conf.region)
+@cli.command()
+@Utils.docstring_parameter(conf)
+def list(**kwargs):
+    modules = ['project', 'queue', 'proxy']
+
+    for m in modules:
+        conf.log.info("")
+        myclass = __import__("lambda_toolkit.modules." + m)
+        args = {}
+        args['action'] = "list"
+        clazz = getattr(getattr(myclass.modules, m), m.title())
+        getattr(clazz(conf, args), args['action'].replace("-", "_") + "_" + m)()
+
+
+print("Initializing lambda-toolkit CLI (v" + __version__ + ") - Region: " + conf.region + " - Auth: " + conf.auth_mode)
 cli()

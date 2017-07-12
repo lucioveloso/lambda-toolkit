@@ -1,5 +1,19 @@
-Invoke lambdas                                        :
+Invoke yours lambdas functions locally or remotely                        
+--------------------------------------------------------------------------
 
- invoke --help for deep information.
+Using invoke command, you can invoke yours lambda functions.              
+The command invoke has the following actions:                             
 
- Examples:
+- local                                                                   
+ For local execution, you must specify:                                    
+ * An event file (-f)                                                     
+ * An existing project (-p)                                               
+
+- remote                                                                  
+For remote execution, you must specify:                                   
+* An event file (-f).                                                       
+* An deployed project (-p) or any existing proxy (-pp).                     
+
+Examples:                                                                 
+lt invoke remote -f helloworld.json --proxyname test                      
+lt invoke local -f helloworld.json -p s3_resources                        

@@ -17,7 +17,11 @@ class Conf:
         self.config_file = os.path.join(os.path.expanduser('~'), ".lambda-toolkit.json")
         self.read_config()
 
+
     def _init_confs(self):
+        if self.region not in self.full_data:
+            self.full_data[self.region] = {}
+
         confs = self.cli.keys()
         # plural issue
         confs.remove("proxy")
@@ -27,6 +31,28 @@ class Conf:
             if c not in self.full_data[self.region]:
                 self.full_data[self.region][c] = {}
             setattr(self, c, self.full_data[self.region][c])
+
+    def get_boto3(self, api_type):
+        if self.auth_mode == "env":
+            return boto3.client(
+                api_type,
+                aws_access_key_id=self.access_key,
+                aws_secret_access_key=self.secret_key,
+                region_name=self.region
+            )
+        else:
+            return boto3.client(api_type)
+
+    def get_boto3_r(self, api_type):
+        if self.auth_mode == "env":
+            return boto3.resource(
+                api_type,
+                aws_access_key_id=self.access_key,
+                aws_secret_access_key=self.secret_key,
+                region_name=self.region
+            )
+        else:
+            return boto3.resource(api_type)
 
     def save_config(self):
         f = open(self.config_file, "w")
@@ -62,12 +88,22 @@ class Conf:
             setattr(self, d.lower(), os.path.join(self.base_dir, self.sett["C_" + d]))
 
         if not os.path.exists(self.base_dir):
-            self.log.info("Creating the base lambda-toolkit folder: '" + self.base_dir + "'.")
             copytree(os.path.join(self.data_dir, self.sett['C_STANDARD_FOLDER_DIR']), self.base_dir)
 
         # Regional Config
-        self.region = boto3.session.Session().region_name
-        if self.region not in self.full_data:
-            self.full_data[self.region] = {}
+        self.auth_mode = "env"
+        for env_var in ['AWS_REGION', 'AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY']:
+            if env_var not in os.environ:
+                self.auth_mode = "file"
+
+        if self.auth_mode == "env":
+            self.region = os.environ['AWS_REGION']
+            self.access_key = os.environ['AWS_ACCESS_KEY_ID']
+            self.secret_key = os.environ['AWS_SECRET_ACCESS_KEY']
+        else:
+            self.region = boto3.session.Session().region_name
+
+        if self.region is None:
+            self.log.critical("Cannot read 'region' from env or credential file")
 
         self._init_confs()
