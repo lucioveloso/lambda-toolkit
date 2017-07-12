@@ -111,7 +111,7 @@ class Proxy:
 
     def _set_proxyname(self, proxyname):
         self.log.debug("Updating proxy environment to: '" + proxyname + "'")
-        if proxyname in self.conf.projects.keys():
+        if  proxyname in self.conf.projects.keys():
             self.log.critical("You cannot create a proxy with the same name of an existing project.")
 
         self.proxyname = proxyname

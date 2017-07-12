@@ -25,8 +25,9 @@ class Project:
     def import_all_project(self):
         lambdas = self.lbs.list_functions()
         for mylb in lambdas['Functions']:
-            self._set_project(mylb['FunctionName'])
-            self.import_project()
+            if mylb['FunctionName'] not in self.conf.proxies:
+                self._set_project(mylb['FunctionName'])
+                self.import_project()
 
         self.log.info("Imported all projects.")
         return self.conf
