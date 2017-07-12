@@ -31,7 +31,7 @@ class Proxy:
                               '{0: <{1}}'.format(self.conf.proxies[q]['sqsname'], 25) +
                               '{0: <{1}}'.format("Runtime:", 10) +
                               self.conf.proxies[q]['runtime'])
-                
+
         return self.conf
 
     def undeploy_all_proxy(self):
@@ -43,6 +43,8 @@ class Proxy:
         return self.conf
 
     def deploy_proxy(self):
+        if self.proxyname in self.conf.projects.keys():
+            self.log.critical("You cannot create a proxy with the same name of an existing project.")
 
         if self.proxyname in self.proxies:
             self.log.critical("The proxy '" + self.proxyname + "' already exists.")
