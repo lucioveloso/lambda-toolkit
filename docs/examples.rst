@@ -77,8 +77,8 @@ To deploy a project to your AWS environment, you can use the command ``lt projec
 
    If you already have a lambda project with this name in your AWS environment, it will be overwritten.
 
-Setting a default lambda
-==========================
+Setting a default role
+=======================
 
 To set a default role to be used always that you do not provide a rolename to deploy a proxy or a lambda project, you can use the command ``lt role``::
 
@@ -125,4 +125,22 @@ To invoke a lambda project remotely, you can use the command ``lt project invoke
 
    You can invoke remotely your lambda-toolkit proxy, providing the argument ``--proxyname`` instead ``--projectname``.
 
+Tailing a remote lambda
+=======================
 
+To tail a remote lambda project, you can use the command ``lt tail cloudwatch``::
+
+   lt tail cloudwatch --loggroupname "/aws/lambda/myLambdaProject"
+   Initializing tail-toolkit CLI (v0.0.5) - Region: eu-west-1
+   Collecting logs in real time, starting from 5 minutes ago
+   START RequestId: 8b690d74-66de-11e7-b54e-2d48a73dcaf9 Version: $LATEST
+   Hi, I'm here. Lambda-proxy is working. =)
+   AWS Event ID: 8b690d74-66de-11e7-b54e-2d48a73dcaf9
+   Event Body: {"account": "123456789000", "region": "eu-west-1", "detail": {"state": "running", "instance-id": "i-03169cf0533d7d000"}, "detail-type": "EC2 Instance State-change Notification", "source": "aws.ec2", "version": "0", "time": "2017-07-12T08:46:05Z", "id": "812d642c-5f46-4588-9dde-bfa4478a4e78", "resources": ["arn:aws:ec2:eu-west-1:123456789000:instance/i-03169cf0533d7d000"]}
+   END RequestId: 8b690d74-66de-11e7-b54e-2d48a73dcaf9
+   REPORT RequestId: 8b690d74-66de-11e7-b54e-2d48a73dcaf9	Duration: 0.69 ms	Billed Duration: 100 ms 	Memory Size: 128 MB	Max Memory Used: 29 MB
+   *************
+
+.. important::
+
+   Please note that tail can be used to any log group name in your cloudwatch environment. To tail your lambda functions you should append the lambda log group prefix ``/aws/lambda/<your lambda function name>``
