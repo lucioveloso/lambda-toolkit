@@ -48,8 +48,8 @@ class Receiver:
                         self.log.info("* Message deleted.")
                     except Exception as e:
                         self.log.warn("* Failed to delete the message. Expired.")
-                        self.log.warn("Configured timeout [QUEUE_GETMESSAGE_VISIBILITY_TIMEOUT]: " + self.conf.sett[
-                            'QUEUE_GETMESSAGE_VISIBILITY_TIMEOUT'])
+                        self.log.warn("Configured timeout [QUEUE_GETMESSAGE_VISIBILITY_TIMEOUT]: " + str(self.conf.sett[
+                            'QUEUE_GETMESSAGE_VISIBILITY_TIMEOUT']))
 
                 else:
                     self.log.info("* Project " + self.projectname + " returned False. Keeping message in the queue.")

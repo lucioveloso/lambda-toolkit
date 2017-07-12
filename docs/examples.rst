@@ -144,3 +144,7 @@ To tail a remote lambda project, you can use the command ``lt tail cloudwatch``:
 .. important::
 
    Please note that tail can be used to any log group name in your cloudwatch environment. To tail your lambda functions you should append the lambda log group prefix ``/aws/lambda/<your lambda function name>``
+
+.. note::
+
+   If you want to debug your remote lambda function, you should use the ``receiver`` command instead the ``tail``.
