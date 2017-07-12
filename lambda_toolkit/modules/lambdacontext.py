@@ -2,7 +2,6 @@ import json
 
 class LambdaContext:
     def __init__(self, context_json):
-        context_json = json.loads(context_json)
         self.aws_request_id = context_json['aws_request_id']
         self.log_stream_name = context_json['log_stream_name']
         self.invoked_function_arn = context_json['invoked_function_arn']

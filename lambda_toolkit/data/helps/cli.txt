@@ -1,0 +1,10 @@
+The lambda-toolkit provides several commands and options.                 
+
+For detailed information about each command you can use:                  
+
+lt [COMMAND] --help                                                       
+
+Usage examples:                                                           
+
+lt invoke --help                                                          
+lt project --help

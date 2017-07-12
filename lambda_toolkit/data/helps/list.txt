@@ -1,0 +1,4 @@
+List all configuration                                                    
+--------------------------------------------------------------------------
+
+List command does not provide any internal parameters.                    

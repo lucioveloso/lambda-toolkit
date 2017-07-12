@@ -1,10 +1,15 @@
-Manage Projects                                        :
-
- project create --help for deep information.
+Manage Projects
+******************************************
 
  Examples:
 
- project create -p myProject -r arn:xxx: -e python2.7
- project deploy-all
- project undeploy-all
- project import -p myAwsExistingProject
+ $ lt project list
+ $ lt project create -p myProject [--runtime nodejs6.10]
+ $ lt project delete -p myProject
+ $ lt project deploy -p myProject [--rolename arn:xxx:yyyy]
+ $ lt project undeploy -p myProject
+ $ lt project deploy-all [--rolename arn:xxx:yyyy]
+ $ lt project undeploy-all
+ $ lt project import -p myAwsProject
+ $ lt project import-all
+ $ lt project list-aws

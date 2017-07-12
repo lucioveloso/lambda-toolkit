@@ -12,7 +12,7 @@ import logger
 
 class Proxy:
     def __init__(self, conf, kwargs):
-        self.lbs = boto3.client('lambda')
+        self.lbs = conf.get_boto3("lambda")
         self.log = logger.get_my_logger(self.__class__.__name__)
         self.conf = conf
         self.proxies = self.conf.proxies.keys()
@@ -25,10 +25,13 @@ class Proxy:
         if len(self.proxies) > 0:
             self.log.info("Proxies (Lambda proxies):")
             for q in self.proxies:
-                self.log.info("- Proxy name '" + q + "' pointing to the queue '"
-                              + self.conf.proxies[q]['sqsname'] + "'\t [Runtime: " +
-                              self.conf.proxies[q]['runtime'] + "]")
-
+                self.log.info('{0: <{1}}'.format("- Proxy name:", 15) +
+                              '{0: <{1}}'.format(q, 25) +
+                              '{0: <{1}}'.format("Queue:", 10) +
+                              '{0: <{1}}'.format(self.conf.proxies[q]['sqsname'], 25) +
+                              '{0: <{1}}'.format("Runtime:", 10) +
+                              self.conf.proxies[q]['runtime'])
+                
         return self.conf
 
     def undeploy_all_proxy(self):
@@ -111,6 +114,6 @@ class Proxy:
         self.log.debug("Updating proxy environment to: '" + proxyname + "'")
         self.proxyname = proxyname
         proxyname_region = proxyname + "_" + self.conf.region
-        self.lambdaproxy_dir = os.path.join(self.conf.lambdas_dir, self.proxyname)
+        self.lambdaproxy_dir = os.path.join(self.conf.lambdas_dir, proxyname_region)
         self.lambdaproxy_zip_dir = os.path.join(self.conf.lambdas_dir, self.conf.sett['C_LAMBDAS_ZIP_DIR'])
-        self.lambdaproxy_zip_file = os.path.join(self.lambdaproxy_zip_dir, self.proxyname + ".zip")
+        self.lambdaproxy_zip_file = os.path.join(self.lambdaproxy_zip_dir, proxyname_region + ".zip")

@@ -7,7 +7,7 @@ import logger
 # TODO _ Maybe it can be another queue-toolkit
 class Queue:
     def __init__(self, conf, kwargs):
-        self.sqs = boto3.client('sqs')
+        self.sqs = conf.get_boto3("sqs")
         self.log = logger.get_my_logger(self.__class__.__name__)
         self.conf = conf
         self.queues = self.conf.queues.keys()
@@ -84,10 +84,12 @@ class Queue:
                 uses = self._verify_queue_in_use()
                 display_uses = ""
                 if uses is not None and len(uses) > 0:
-                    display_uses = "\t[Used by: " + ', '.join(map(str, uses)) + "]"
+                    display_uses = ', '.join(map(str, uses))
 
-                self.log.info("- Queue name: " + q + display_uses)
-
+                self.log.info('{0: <{1}}'.format("- Queue name:", 15) +
+                              '{0: <{1}}'.format(q, 25) +
+                              '{0: <{1}}'.format("Used by:", 10) +
+                              display_uses)
 
         return self.conf
 
