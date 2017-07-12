@@ -130,7 +130,7 @@ Tailing a remote lambda
 
 To tail a remote lambda project, you can use the command ``lt tail cloudwatch``::
 
-   lt tail cloudwatch --loggroupname "/aws/lambda/myLambdaProject"
+   $ lt tail cloudwatch --loggroupname "/aws/lambda/myLambdaProject"
    Initializing tail-toolkit CLI (v0.0.5) - Region: eu-west-1
    Collecting logs in real time, starting from 5 minutes ago
    START RequestId: 8b690d74-66de-11e7-b54e-2d48a73dcaf9 Version: $LATEST
