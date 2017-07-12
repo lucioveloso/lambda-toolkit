@@ -216,6 +216,8 @@ class Project:
 
     def _set_project(self, projectname):
         self.log.debug("Updating project environment to: '" + projectname + "'")
+        if projectname in self.conf.proxies.keys():
+            self.log.critical("You cannot create a project with the same name of an existing proxy.")
         self.projectname = projectname
         projectname_region = projectname + "_" + self.conf.region
         self.project_dir = os.path.join(self.conf.lambdas_dir, projectname_region)

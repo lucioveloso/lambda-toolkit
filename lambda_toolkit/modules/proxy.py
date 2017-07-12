@@ -43,9 +43,6 @@ class Proxy:
         return self.conf
 
     def deploy_proxy(self):
-        if self.proxyname in self.conf.projects.keys():
-            self.log.critical("You cannot create a proxy with the same name of an existing project.")
-
         if self.proxyname in self.proxies:
             self.log.critical("The proxy '" + self.proxyname + "' already exists.")
 
@@ -114,6 +111,9 @@ class Proxy:
 
     def _set_proxyname(self, proxyname):
         self.log.debug("Updating proxy environment to: '" + proxyname + "'")
+        if proxyname in self.conf.projects.keys():
+            self.log.critical("You cannot create a proxy with the same name of an existing project.")
+
         self.proxyname = proxyname
         proxyname_region = proxyname + "_" + self.conf.region
         self.lambdaproxy_dir = os.path.join(self.conf.lambdas_dir, proxyname_region)
