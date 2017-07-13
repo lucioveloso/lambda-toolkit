@@ -64,7 +64,7 @@ def project(**kwargs):
 
 @cli.command()
 @click.argument('action', required=True, type=click.Choice(Utils.click_get_command_choice("role", conf)))
-@click.option('--rolename',
+@click.option('--rolename', '-r',
               help="Define the role or try to get the default.")
 @Utils.docstring_parameter(conf)
 def role(**kwargs):

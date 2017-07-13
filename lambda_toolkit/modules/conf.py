@@ -19,8 +19,11 @@ class Conf:
 
 
     def _init_confs(self):
-        if self.region not in self.full_data:
-            self.full_data[self.region] = {}
+        if 'regions' not in self.file_conf:
+            self.file_conf['regions'] = {}
+
+        if self.region not in self.file_conf['regions']:
+            self.file_conf['regions'][self.region] = {}
 
         confs = self.cli.keys()
         # plural issue
@@ -28,9 +31,9 @@ class Conf:
         confs.append("proxie")
         for c in confs:
             c = c + "s"
-            if c not in self.full_data[self.region]:
-                self.full_data[self.region][c] = {}
-            setattr(self, c, self.full_data[self.region][c])
+            if c not in self.file_conf['regions'][self.region]:
+                self.file_conf['regions'][self.region][c] = {}
+            setattr(self, c, self.file_conf['regions'][self.region][c])
 
     def get_boto3(self, api_type):
         if self.auth_mode == "env":
@@ -41,7 +44,7 @@ class Conf:
                 region_name=self.region
             )
         else:
-            return boto3.client(api_type)
+            return boto3.client(api_type, region_name=self.region)
 
     def get_boto3_r(self, api_type):
         if self.auth_mode == "env":
@@ -52,29 +55,32 @@ class Conf:
                 region_name=self.region
             )
         else:
-            return boto3.resource(api_type)
+            return boto3.resource(api_type, region_name=self.region)
 
     def save_config(self):
         f = open(self.config_file, "w")
-        f.write(json.dumps(self.full_data, indent=4))
+        f.write(json.dumps(self.file_conf, indent=4))
         f.close()
 
     def read_config(self):
-        self.full_data = None
+        self.file_conf = None
         if os.path.isfile(self.config_file):
             f = open(self.config_file, "r")
-            self.full_data = json.loads(f.read())
+            self.file_conf = json.loads(f.read())
             f.close()
         else:
             self.log.info("Creating a new config file: '" + self.config_file + "'")
             f = open(self.config_file, "w")
-            self.full_data = json.loads(pkgutil.get_data("lambda_toolkit", "data/lambda-toolkit.json"))
-            f.write(json.dumps(self.full_data, indent=4))
+            self.file_conf = json.loads(pkgutil.get_data("lambda_toolkit", "data/lambda-toolkit.json"))
+            f.write(json.dumps(self.file_conf, indent=4))
             f.close()
 
-        # Global Config
-        self.cli = self.full_data['cli']
-        self.sett = self.full_data['settings']
+        # Fill objects with conf data
+        ## Loads static configs from original ini to force updates without impact
+        self.cli = json.loads(pkgutil.get_data("lambda_toolkit", "data/lambda-toolkit.json"))['cli']
+        self.aws_regions = json.loads(pkgutil.get_data("lambda_toolkit", "data/lambda-toolkit.json"))['aws-regions']
+
+        self.sett = self.file_conf['settings']
 
         # Create basic folders
         self.data_dir = pkgutil.get_loader("lambda_toolkit").filename
