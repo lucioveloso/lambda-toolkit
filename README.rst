@@ -54,10 +54,3 @@ Get started NOW!
 ==============================
 
 Access our documentation, and set up it now.
-
-==============================
-Building
-==============================
-* `Linux <linux_doc_link_>`_.
-
-.. _linux_doc_link: linux.md
