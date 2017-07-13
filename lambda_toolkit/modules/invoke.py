@@ -24,14 +24,13 @@ class Invoke:
         else:
             self.log.info("Importing project " + self.kwargs['projectname'])
             pp = os.path.join(os.path.expanduser(self.conf.sett['C_BASE_DIR']), self.conf.sett['C_LAMBDAS_DIR'],
-                              self.kwargs['projectname'] + "_" + self.conf.region)
+                              self.conf.region + "/" + self.kwargs['projectname'])
             self.log.debug("Using project dir: " + pp)
             sys.path.append(pp)
             a = __import__("index")
             func = getattr(a, "lambda_handler")
 
             ctx = LambdaContext(json.loads(open(os.path.join(self.conf.invoke_dir_ctx, self.conf.sett['C_INVOKE_CTX_FILE'])).read()))
-            #ctx = LambdaContext(json.loads(pkgutil.get_data("lambda_toolkit", "data/standard-folder/invoke/contexts/python.json")))
 
             func(self._get_event(), ctx)
 
