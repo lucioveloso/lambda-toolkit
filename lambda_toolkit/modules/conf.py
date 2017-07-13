@@ -78,8 +78,6 @@ class Conf:
 
         # Create basic folders
         self.data_dir = pkgutil.get_loader("lambda_toolkit").filename
-
-        # TODO: reflexion
         self.base_dir = os.path.expanduser(self.sett['C_BASE_DIR'])
 
         list_dir = ["LAMBDAS_DIR", "INVOKE_DIR", "INVOKE_DIR_EVT", "INVOKE_DIR_CTX"]
