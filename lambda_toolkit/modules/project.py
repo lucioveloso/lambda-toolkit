@@ -208,11 +208,11 @@ class Project:
     def _create_project_folders(self):
         if not os.path.exists(self.project_dir):
             self.log.info("Creating the project lambda-toolkit folder '" + self.project_dir + "'")
-            os.mkdir(self.project_dir)
+            os.makedirs(self.project_dir)
 
         if not os.path.exists(self.project_zip_dir):
             self.log.info("Creating the zip lambda-toolkit folder '" + self.project_zip_dir + "'")
-            os.mkdir(self.project_zip_dir)
+            os.makedirs(self.project_zip_dir)
 
 
     def _set_project(self, projectname):
@@ -220,10 +220,10 @@ class Project:
         if projectname in self.conf.proxies.keys():
             self.log.critical("You cannot create a project with the same name of an existing proxy.")
         self.projectname = projectname
-        projectname_region = projectname + "_" + self.conf.region
+        projectname_region = self.conf.region + "/" + projectname
         self.project_dir = os.path.join(self.conf.lambdas_dir, projectname_region)
         self.project_zip_dir = os.path.join(self.conf.lambdas_dir,
-                                            self.conf.sett['C_LAMBDAS_ZIP_DIR'] + "_" + self.conf.region)
+                                            self.conf.region + "/" + self.conf.sett['C_LAMBDAS_ZIP_DIR'])
         self.project_zip_file = os.path.join(self.project_zip_dir, projectname_region + ".zip")
         self.project_zip_file_without_ext = os.path.join(self.project_zip_dir, projectname_region)
 
