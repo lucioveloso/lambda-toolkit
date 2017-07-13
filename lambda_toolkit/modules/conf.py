@@ -86,6 +86,7 @@ class Conf:
             setattr(self, d.lower(), os.path.join(self.base_dir, self.sett["C_" + d]))
 
         if not os.path.exists(self.base_dir):
+            print("Creating")
             copytree(os.path.join(self.data_dir, self.sett['C_STANDARD_FOLDER_DIR']), self.base_dir)
 
         # Regional Config
