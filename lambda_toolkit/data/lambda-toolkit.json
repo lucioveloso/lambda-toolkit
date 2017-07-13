@@ -33,9 +33,10 @@
             "delete": [ "sqsname" ],
             "delete-all": []
           }
-        }, 
+        },
         "project": {
           "commands": {
+            "list-all-aws" : [],
             "list-aws": [],
             "undeploy": [ "projectname" ],
             "deploy": [ "projectname", "rolename" ],
@@ -46,10 +47,16 @@
             "import": [ "projectname" ],
             "deploy-all": [ "rolename" ],
             "delete": [ "projectname" ],
-            "delete-all": []
+            "delete-all": [],
+            "check-regions-delay": [],
+            "import-all-regions": [],
+            "delete-all-regions": [],
+            "undeploy-all-regions": [],
+            "deploy-all-regions": [ "rolename" ]
           }
         }
-    }, 
+    },
+    "aws-regions": ["ap-south-1", "eu-west-2", "eu-west-1", "ap-northeast-2", "ap-northeast-1", "sa-east-1", "ca-central-1", "ap-southeast-1", "ap-southeast-2", "eu-central-1", "us-east-1", "us-east-2", "us-west-1", "us-west-2"],
     "settings": {
         "C_LAMBDAS_DIR": "lambdas/",
         "C_STANDARD_FOLDER_DIR": "data/standard-folder",
