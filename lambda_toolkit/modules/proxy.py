@@ -4,22 +4,28 @@ import os
 import pkgutil
 from shutil import make_archive
 from shutil import rmtree
-
-import boto3
-
+from utils import Utils
 import logger
 
 
 class Proxy:
     def __init__(self, conf, kwargs):
         self.lbs = conf.get_boto3("lambda", "client")
-        self.log = logger.get_my_logger(self.__class__.__name__)
-        self.conf = conf
+        self.log = conf.log
+
+        if Utils.check_kwargs(kwargs, "region"):
+            self.log.info("Updating region to '" + kwargs['region'] + "'.")
+            self.conf = conf.set_region(kwargs['region'])
+        else:
+            self.conf = conf
+
+        if Utils.check_kwargs(kwargs, "proxyname"):
+            self.proxyname = kwargs['proxyname']
+            self._set_proxyname(kwargs['proxyname'])
+
         self.proxies = self.conf.proxies.keys()
         self.queues = self.conf.queues.keys()
         self.kwargs = kwargs
-        if 'proxyname' in kwargs and kwargs['proxyname'] is not None:
-            self._set_proxyname(kwargs['proxyname'])
 
     def list_proxy(self):
         if len(self.proxies) > 0:
@@ -50,7 +56,7 @@ class Proxy:
             self.log.critical("The queue '" + self.proxyname + "' does not exist.")
 
         try:
-            os.mkdir(self.lambdaproxy_dir)
+            os.makedirs(self.lambdaproxy_dir)
         except Exception as a:
             self.log.debug("Proxy temp folder already exists")
 
@@ -115,11 +121,12 @@ class Proxy:
             self.log.critical("You cannot create a proxy with the same name of an existing project.")
 
         self.proxyname = proxyname
-        proxyname_region = proxyname + "_" + self.conf.region
         self.lambdaproxy_dir = os.path.join(os.path.expanduser(self.conf.sett['C_BASE_DIR']),
                                             self.conf.sett['C_LAMBDAS_DIR'],
-                                            proxyname_region)
+                                            self.conf.region,
+                                            proxyname)
         self.lambdaproxy_zip_dir = os.path.join(os.path.expanduser(self.conf.sett['C_BASE_DIR']),
                                                 self.conf.sett['C_LAMBDAS_DIR'],
+                                                self.conf.region,
                                                 self.conf.sett['C_LAMBDAS_ZIP_DIR'])
-        self.lambdaproxy_zip_file = os.path.join(self.lambdaproxy_zip_dir, proxyname_region + ".zip")
+        self.lambdaproxy_zip_file = os.path.join(self.lambdaproxy_zip_dir, proxyname + ".zip")

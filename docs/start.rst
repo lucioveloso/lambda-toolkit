@@ -135,7 +135,7 @@ The first step is clone the repository::
 
 Install the requirements using pip::
 
-   $ pip install -r lambda-toolkit/user-requirements.txt
+   $ pip install -r lambda-toolkit/requirements-user.txt
    $ lambda-toolkit/bin/lt --help
 
 And then, you are able to run the lambda-toolkit from current user:

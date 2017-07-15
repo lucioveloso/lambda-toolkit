@@ -86,6 +86,13 @@ class Utils:
             return value + ".fifo"
 
     @staticmethod
+    def check_kwargs(kwargs, value):
+        if value in kwargs and kwargs[value] is not None:
+            return True
+
+        return False
+
+    @staticmethod
     def click_verify_role_exists(ctx, param, value):
         if value == "":
             return None

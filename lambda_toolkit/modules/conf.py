@@ -39,6 +39,8 @@ class Conf:
                 self.json_conf['configurations'][self.region][c] = {}
             setattr(self, c, self.json_conf['configurations'][self.region][c])
 
+        return self
+
     def save_config(self):
         with open(self.config_file, "w") as f:
             f.write(json.dumps(self.json_conf, indent=4))
