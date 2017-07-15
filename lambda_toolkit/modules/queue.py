@@ -1,18 +1,24 @@
 #!/usr/bin/env python
 
-import boto3
-
+from utils import Utils
 import logger
 
-# TODO _ Maybe it can be another queue-toolkit
+
 class Queue:
     def __init__(self, conf, kwargs):
         self.sqs = conf.get_boto3("sqs", "client")
-        self.log = logger.get_my_logger(self.__class__.__name__)
-        self.conf = conf
-        self.queues = self.conf.queues.keys()
-        if 'sqsname' in kwargs and kwargs['sqsname'] is not None:
+        self.log = conf.log
+
+        if Utils.check_kwargs(kwargs, "region"):
+            self.log.info("Updating region to '" + kwargs['region'] + "'.")
+            self.conf = conf.set_region(kwargs['region'])
+        else:
+            self.conf = conf
+
+        if Utils.check_kwargs(kwargs, "sqsname"):
             self.sqsname = kwargs['sqsname']
+
+        self.queues = self.conf.queues.keys()
 
     def create_queue(self):
         if self.sqsname in self.conf.queues:

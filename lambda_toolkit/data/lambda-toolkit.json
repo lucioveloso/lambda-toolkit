@@ -36,8 +36,9 @@
         },
         "project": {
           "commands": {
-            "list-all-aws" : [],
+            "list-aws-all" : [],
             "list-aws": [],
+            "list-all": [],
             "undeploy": [ "projectname" ],
             "deploy": [ "projectname", "rolename" ],
             "create": [ "projectname" ],

@@ -2,23 +2,31 @@
 
 import os
 import pkgutil
+from utils import Utils
 from shutil import make_archive
 from shutil import rmtree
 from urllib import urlretrieve
 from zipfile import ZipFile
 import time
-import boto3
-import logger
 
 
 class Project:
     def __init__(self, conf, kwargs):
-        self.conf = conf
         self.log = conf.log
+
+        if Utils.check_kwargs(kwargs, "region"):
+            self.log.info("Updating region to '" + kwargs['region'] + "'.")
+            self.conf = conf.set_region(kwargs['region'])
+        else:
+            self.conf = conf
+
+        if Utils.check_kwargs(kwargs, "projectname"):
+            self.projectname = kwargs['projectname']
+            self._set_project(self.projectname)
+
         self.kwargs = kwargs
         self.projects = self.conf.projects.keys()
-        if 'projectname' in kwargs and kwargs['projectname'] is not None:
-            self._set_project(kwargs['projectname'])
+
 
     def _update_new_region(self, reg):
         self.conf.set_region(reg)
@@ -207,10 +215,17 @@ class Project:
 
         return self.conf
 
-    def list_all_aws_project(self):
+    def list_aws_all_project(self):
         for reg in self.conf.aws_regions:
             self._update_new_region(reg)
             self.list_aws_project()
+
+        return self.conf
+
+    def list_all_project(self):
+        for reg in self.conf.aws_regions:
+            self._update_new_region(reg)
+            self.list_project()
 
         return self.conf
 
@@ -242,7 +257,7 @@ class Project:
 
     def list_project(self):
         if len(self.projects) > 0:
-            self.log.info("User Projects (Lambda Functions):")
+            self.log.info("User Projects (Lambda Functions in " + self.conf.region + "):")
             for p in self.projects:
                 self.log.info('{0: <{1}}'.format("- Project:", 15) +
                               '{0: <{1}}'.format(p, 25) +

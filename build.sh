@@ -5,7 +5,7 @@ if [ "$1" == "make" ]; then
     virtualenv build_env
     source build_env/bin/activate
     python2.7 setup.py sdist
-    pip install -r requirements.txt
+    pip install -r requirements-dev.txt
     python2.7 setup.py bdist_wheel
 elif [ "$1" == "clean" ]; then
     echo -n "Roger that. "

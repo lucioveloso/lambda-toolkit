@@ -34,6 +34,7 @@ def cli(**kwargs):
 @cli.command()
 @click.argument('action', required=True, type=click.Choice(Utils.click_get_command_choice("queue", conf)))
 @click.option('--sqsname', '-q', callback=Utils.click_append_fifo_in_queue, help="Define the queue.")
+@click.option('--region', '-R', type=click.Choice(conf.aws_regions), help="Define the optional region.")
 @Utils.docstring_parameter(conf)
 def queue(**kwargs):
     execute_cli(kwargs)
@@ -47,6 +48,7 @@ def queue(**kwargs):
               help="Define the role or try to get the default.")
 @click.option('--runtime','-e', default="python2.7", help="Define runtime. (Default: Python2.7)",
               type=click.Choice(Utils.click_list_runtime()))
+@click.option('--region', '-R', type=click.Choice(conf.aws_regions), help="Define the optional region.")
 @Utils.docstring_parameter(conf)
 def proxy(**kwargs):
     execute_cli(kwargs)
@@ -58,6 +60,7 @@ def proxy(**kwargs):
               help="Define the role or try to get the default.")
 @click.option('--runtime','-e', default="python2.7", help="Define runtime. (Default: Python2.7)",
               type=click.Choice(Utils.click_list_runtime()))
+@click.option('--region', '-R', type=click.Choice(conf.aws_regions), help="Define the optional region.")
 @Utils.docstring_parameter(conf)
 def project(**kwargs):
     execute_cli(kwargs)
