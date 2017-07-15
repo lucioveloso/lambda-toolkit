@@ -13,22 +13,19 @@ import logger
 
 class Project:
     def __init__(self, conf, kwargs):
-        self.log = logger.get_my_logger(self.__class__.__name__)
         self.conf = conf
+        self.log = conf.log
         self.kwargs = kwargs
         self.projects = self.conf.projects.keys()
         if 'projectname' in kwargs and kwargs['projectname'] is not None:
             self._set_project(kwargs['projectname'])
 
-
     def _update_new_region(self, reg):
-        self.conf.region = reg
-        self.conf._init_confs()
+        self.conf.set_region(reg)
         self.projects = self.conf.projects.keys()
 
-
     def import_all_project(self):
-        lambdas = self.conf.get_boto3("lambda").list_functions()
+        lambdas = self.conf.get_boto3("lambda", "client").list_functions()
         for mylb in lambdas['Functions']:
             if mylb['FunctionName'] not in self.conf.proxies:
                 self._set_project(mylb['FunctionName'])
@@ -102,7 +99,7 @@ class Project:
             return self.conf
 
         try:
-            lambda_function = self.conf.get_boto3("lambda").get_function(FunctionName=self.projectname)
+            lambda_function = self.conf.get_boto3("lambda", "client").get_function(FunctionName=self.projectname)
 
             if self.projectname in self.conf.projects:
                 self.log.info("Project '" + self.projectname + "' already exists in your configuration. Updating.")
@@ -133,20 +130,20 @@ class Project:
         make_archive(self.project_zip_file_without_ext, "zip", self.project_dir)
 
         try:
-            self.conf.get_boto3("lambda").get_function(FunctionName=self.projectname)
+            self.conf.get_boto3("lambda", "client").get_function(FunctionName=self.projectname)
             replace = True
         except Exception:
             replace = False
 
         try:
             if replace:
-                self.conf.get_boto3("lambda").update_function_code(
+                self.conf.get_boto3("lambda", "client").update_function_code(
                     FunctionName=self.projectname,
                     ZipFile=open(self.project_zip_file, "rb").read()
                 )
                 self.log.info("Lambda project " + self.projectname + " was redeployed.")
             else:
-                self.conf.get_boto3("lambda").create_function(
+                self.conf.get_boto3("lambda", "client").create_function(
                     FunctionName=self.projectname,
                     Runtime=self.conf.projects[self.projectname]['runtime'],
                     Role=self.kwargs['rolename'],
@@ -172,7 +169,7 @@ class Project:
             self.log.critical("Project '" + self.projectname + "' does not exist.")
 
         try:
-            self.conf.get_boto3("lambda").delete_function(FunctionName=self.projectname)
+            self.conf.get_boto3("lambda", "client").delete_function(FunctionName=self.projectname)
             self.log.info("Project '" + self.projectname + "' is now undeployed.")
         except Exception as e:
             self.log.warn("Project '" + self.projectname + "' is not deployed.")
@@ -221,7 +218,7 @@ class Project:
         for reg in self.conf.aws_regions:
             self._update_new_region(reg)
             start_time = time.time()
-            self.conf.get_boto3("lambda").list_functions()
+            self.conf.get_boto3("lambda", "client").list_functions()
             self.log.info('{0: <{1}}'.format(self.conf.region + ": ", 20) +
                           str((time.time() - start_time)))
 
@@ -229,7 +226,7 @@ class Project:
 
     def list_aws_project(self):
         self.log.info("AWS Projects (Lambda Functions in " + self.conf.region + "):")
-        lambdas = self.conf.get_boto3("lambda").list_functions()
+        lambdas = self.conf.get_boto3("lambda", "client").list_functions()
         for mylb in lambdas['Functions']:
             imported = False
             if mylb['FunctionName'] in self.projects:
@@ -269,12 +266,15 @@ class Project:
     def _set_project(self, projectname):
         self.log.debug("Updating project environment to: '" + projectname + "'")
         if projectname in self.conf.proxies.keys():
-            self.log.critical("You cannot create a project with the same name of an existing proxy.")
+            self.log.critical("You cannot act in a project with the same name of an existing proxy.")
         self.projectname = projectname
-        projectname_region = self.conf.region + "/" + projectname
-        self.project_dir = os.path.join(self.conf.lambdas_dir, projectname_region)
-        self.project_zip_dir = os.path.join(self.conf.lambdas_dir,
-                                            self.conf.region + "/" + self.conf.sett['C_LAMBDAS_ZIP_DIR'])
+        self.project_dir = os.path.join(os.path.expanduser(self.conf.sett['C_BASE_DIR']),
+                                        self.conf.sett['C_LAMBDAS_DIR'],
+                                        self.conf.region, projectname)
+        self.project_zip_dir = os.path.join(os.path.expanduser(self.conf.sett['C_BASE_DIR']),
+                                            self.conf.sett['C_LAMBDAS_DIR'],
+                                            self.conf.region,
+                                            self.conf.sett['C_LAMBDAS_ZIP_DIR'])
         self.project_zip_file = os.path.join(self.project_zip_dir, projectname + ".zip")
         self.project_zip_file_without_ext = os.path.join(self.project_zip_dir, projectname)
 
