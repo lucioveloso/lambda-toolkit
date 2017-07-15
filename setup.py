@@ -23,7 +23,7 @@ def find_version(*file_paths):
 
 requires = ['boto3>=1.4.4',
             'botocore>=1.5.78',
-            'tail-toolkit>=0.0.4',
+            'tail-toolkit>=0.0.7',
             'click>=6.7.0']
 
 setup_options = dict(
@@ -45,7 +45,8 @@ setup_options = dict(
         'Natural Language :: English',
         'License :: OSI Approved :: Apache Software License',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 2.7'
+        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 3',
     ),
 )
 

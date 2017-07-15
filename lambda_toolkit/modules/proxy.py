@@ -2,10 +2,10 @@
 
 import os
 import pkgutil
+import pickle
 from shutil import make_archive
 from shutil import rmtree
-from utils import Utils
-import logger
+from lambda_toolkit.modules.utils import Utils
 
 
 class Proxy:
@@ -41,7 +41,7 @@ class Proxy:
         return self.conf
 
     def undeploy_all_proxy(self):
-        for q in self.proxies:
+        for q in list(self.proxies):
             self._set_proxyname(q)
             self.undeploy_proxy()
 
@@ -68,7 +68,8 @@ class Proxy:
 
         f2 = open(os.path.join(self.lambdaproxy_dir, index_file), "w")
         for line in f1.splitlines():
-            f2.write(line.replace(self.conf.sett['C_LAMBDASTANDERD_FUNC_VAR_REPLACE'], self.kwargs['sqsname']))
+            a = str(line.decode()).replace(self.conf.sett['C_LAMBDASTANDERD_FUNC_VAR_REPLACE'], self.kwargs['sqsname'])
+            f2.write(a)
             f2.write("\n")
         f2.close()
 

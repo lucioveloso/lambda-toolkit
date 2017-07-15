@@ -1,3 +1,9 @@
+#### Version 0.3
+
+* Compatible with Python 2 and 3.
+* Major bugs fixed
+* Multi region support improved
+
 #### Version 0.2
 
 * Rewrited from scratch

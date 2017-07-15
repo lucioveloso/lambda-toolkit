@@ -1,4 +1,4 @@
 boto3>=1.4.4
 botocore>=1.5.78
-tail-toolkit>=0.0.1
+tail-toolkit>=0.0.7
 click>=6.7

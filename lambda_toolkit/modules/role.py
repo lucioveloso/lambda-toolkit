@@ -1,11 +1,10 @@
 #!/usr/bin/env python
 
-import logger
-from utils import Utils
+from lambda_toolkit.modules.utils import Utils
 
 class Role:
     def __init__(self, conf, kwargs):
-        self.log = logger.get_my_logger(self.__class__.__name__)
+        self.log = conf.log
         self.conf = conf
         self.rolename = kwargs['rolename']
 

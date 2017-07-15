@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import logger
+import lambda_toolkit.modules.logger as logger
 import os
 import json
 import pkgutil
@@ -29,7 +29,7 @@ class Conf:
         if self.region not in self.json_conf['configurations']:
             self.json_conf['configurations'][self.region] = {}
 
-        confs = self.cli.keys()
+        confs = list(self.cli)
         # plural issue
         confs.remove("proxy")
         confs.append("proxie")
@@ -74,7 +74,7 @@ class Conf:
 
     def _copy_default_folder(self):
         if not os.path.exists(os.path.expanduser(self.sett['C_BASE_DIR'])):
-            copytree(os.path.join(pkgutil.get_loader("lambda_toolkit").filename,
+            copytree(os.path.join("lambda_toolkit",
                                   self.sett['C_STANDARD_FOLDER_DIR']),
                      os.path.expanduser(self.sett['C_BASE_DIR']))
 

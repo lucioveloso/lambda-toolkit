@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 
-import logger
+import lambda_toolkit.modules.logger as logger
 import boto3
 import pkgutil
 import os
+import sys
 
 
 class Utils:
@@ -11,11 +12,10 @@ class Utils:
     def __init__(self):
         pass
 
-
     @staticmethod
     def docstring_parameter(*sub):
         def dec(obj):
-            obj.__doc__ = pkgutil.get_data("lambda_toolkit", os.path.join(sub[0].sett['C_HELPS_FILES'], obj.func_name + ".txt"))
+            obj.__doc__ = pkgutil.get_data("lambda_toolkit", os.path.join(sub[0].sett['C_HELPS_FILES'], obj.__name__ + ".txt"))
             return obj
         return dec
 
@@ -45,7 +45,11 @@ class Utils:
         if ctx.info_name in conf.cli:
             if ctx.params['action'] in conf.cli[ctx.info_name]['commands']:
                 for check in conf.cli[ctx.info_name]['commands'][ctx.params['action']]:
-                    if isinstance(check, unicode):
+                    if sys.version_info[0] == 3:
+                        instance_type = str
+                    else:
+                        instance_type = unicode
+                    if isinstance(check, instance_type):
                         # For single parameters
                         c = check.replace("-", "_")
                         if ctx.params[c] is None:

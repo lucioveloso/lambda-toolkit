@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 
-from conf import Conf
-from utils import Utils
-import logger
+from lambda_toolkit.modules.conf import Conf
+from lambda_toolkit.modules.utils import Utils
 import click
 from lambda_toolkit import __version__
 import sys
