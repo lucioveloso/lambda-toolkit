@@ -18,9 +18,9 @@ class Role:
         return self.conf
 
     def unset_default_role(self):
-        if "C_DEFAULT_ROLE" in self.conf.sett:
+        if self.conf.sett['C_DEFAULT_ROLE'] is not None:
             self.log.info("Unset the default role '" + self.conf.sett['C_DEFAULT_ROLE'] + "'.")
-            self.conf.sett.pop('C_DEFAULT_ROLE')
+            self.conf.sett['C_DEFAULT_ROLE'] = ""
         else:
             self.log.warn("There isn't a default role configured.")
 

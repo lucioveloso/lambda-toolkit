@@ -35,7 +35,7 @@ class Utils:
     @staticmethod
     def click_list_event_files(conf):
         opts = ['']
-        for f in os.listdir(conf.invoke_dir_evt):
+        for f in os.listdir(os.path.join(os.path.expanduser(conf.sett['C_BASE_DIR']), conf.sett['C_INVOKE_DIR_EVT'])):
             opts.append(f)
         return opts
 
@@ -87,7 +87,7 @@ class Utils:
 
     @staticmethod
     def click_verify_role_exists(ctx, param, value):
-        if value is None:
+        if value == "":
             return None
         client = boto3.client('iam')
         try:
@@ -100,10 +100,3 @@ class Utils:
             logger.get_my_logger("Utils").critical("The role '" + value + "' does not exist.")
 
         return None
-
-    @staticmethod
-    def get_default_role(conf):
-        if 'C_DEFAULT_ROLE' not in conf.sett:
-            return None
-        else:
-            return conf.sett['C_DEFAULT_ROLE']

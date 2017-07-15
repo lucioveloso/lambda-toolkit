@@ -16,7 +16,7 @@ class Receiver:
         self.conf = conf
         self.sqsname = kwargs['sqsname']
         self.projectname = kwargs['projectname']
-        self.sqs = conf.get_boto3_r("sqs")
+        self.sqs = conf.get_boto3("sqs", "resource")
 
     def collect_receiver(self):
 

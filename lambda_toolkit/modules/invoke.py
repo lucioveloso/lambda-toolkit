@@ -12,7 +12,7 @@ from lambdacontext import LambdaContext
 
 class Invoke:
     def __init__(self, conf, kwargs):
-        self.lbs = conf.get_boto3("lambda")
+        self.lbs = conf.get_boto3("lambda", "client")
         self.log = logger.get_my_logger(self.__class__.__name__)
         self.conf = conf
         self.kwargs = kwargs
@@ -23,14 +23,18 @@ class Invoke:
             self.log.critical("Please find: lambda-toolkit-js project.")
         else:
             self.log.info("Importing project " + self.kwargs['projectname'])
-            pp = os.path.join(os.path.expanduser(self.conf.sett['C_BASE_DIR']), self.conf.sett['C_LAMBDAS_DIR'],
-                              self.conf.region + "/" + self.kwargs['projectname'])
+            pp = os.path.join(os.path.expanduser(self.conf.sett['C_BASE_DIR']),
+                              self.conf.sett['C_LAMBDAS_DIR'],
+                              self.conf.region,
+                              self.kwargs['projectname'])
+
             self.log.debug("Using project dir: " + pp)
             sys.path.append(pp)
-            a = __import__("index")
-            func = getattr(a, "lambda_handler")
+            func = getattr(__import__("index"), "lambda_handler")
 
-            ctx = LambdaContext(json.loads(open(os.path.join(self.conf.invoke_dir_ctx, self.conf.sett['C_INVOKE_CTX_FILE'])).read()))
+            ctx = LambdaContext(json.loads(open(os.path.join(os.path.expanduser(self.conf.sett['C_BASE_DIR']),
+                                                             self.conf.sett['C_INVOKE_DIR_CTX'],
+                                                             self.conf.sett['C_INVOKE_CTX_FILE'])).read()))
 
             func(self._get_event(), ctx)
 
@@ -49,7 +53,9 @@ class Invoke:
             FunctionName=invoke_lambda,
             LogType='Tail',
             InvocationType='RequestResponse',
-            Payload=open(os.path.join(self.conf.invoke_dir_evt, self.kwargs['event_file']))
+            Payload=open(os.path.join(os.path.expanduser(self.conf.sett['C_BASE_DIR']),
+                                      self.conf.sett['C_INVOKE_DIR_EVT'],
+                                      self.kwargs['event_file']))
         )
 
         print base64.b64decode(ret['LogResult'])
@@ -57,5 +63,8 @@ class Invoke:
         return self.conf
 
     def _get_event(self):
-        with open(os.path.join(self.conf.invoke_dir_evt, self.kwargs['event_file']), 'r') as f:
+        with open(os.path.join(os.path.expanduser(self.conf.sett['C_BASE_DIR']),
+                               self.conf.sett['C_INVOKE_DIR_EVT'],
+                               self.kwargs['event_file']),
+                  'r') as f:
             return json.loads(f.read())

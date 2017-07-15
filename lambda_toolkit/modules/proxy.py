@@ -12,7 +12,7 @@ import logger
 
 class Proxy:
     def __init__(self, conf, kwargs):
-        self.lbs = conf.get_boto3("lambda")
+        self.lbs = conf.get_boto3("lambda", "client")
         self.log = logger.get_my_logger(self.__class__.__name__)
         self.conf = conf
         self.proxies = self.conf.proxies.keys()
@@ -116,6 +116,10 @@ class Proxy:
 
         self.proxyname = proxyname
         proxyname_region = proxyname + "_" + self.conf.region
-        self.lambdaproxy_dir = os.path.join(self.conf.lambdas_dir, proxyname_region)
-        self.lambdaproxy_zip_dir = os.path.join(self.conf.lambdas_dir, self.conf.sett['C_LAMBDAS_ZIP_DIR'])
+        self.lambdaproxy_dir = os.path.join(os.path.expanduser(self.conf.sett['C_BASE_DIR']),
+                                            self.conf.sett['C_LAMBDAS_DIR'],
+                                            proxyname_region)
+        self.lambdaproxy_zip_dir = os.path.join(os.path.expanduser(self.conf.sett['C_BASE_DIR']),
+                                                self.conf.sett['C_LAMBDAS_DIR'],
+                                                self.conf.sett['C_LAMBDAS_ZIP_DIR'])
         self.lambdaproxy_zip_file = os.path.join(self.lambdaproxy_zip_dir, proxyname_region + ".zip")

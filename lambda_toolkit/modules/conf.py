@@ -7,23 +7,27 @@ import pkgutil
 import boto3
 from shutil import copytree
 
+
 class Conf:
 
-    config = ""
-    vars = ""
-
     def __init__(self):
-        self.log = logger.get_my_logger(self.__class__.__name__)
         self.config_file = os.path.join(os.path.expanduser('~'), ".lambda-toolkit.json")
-        self.read_config()
+        self.log = logger.get_my_logger("lambda-toolkit")
+        # Get default configuration
+        default_conf = json.loads(pkgutil.get_data("lambda_toolkit", "data/lambda-toolkit.json"))
+        self.cli = default_conf['cli']
+        self.aws_regions = default_conf['aws-regions']
+        self.sett = self._sync_settings(default_conf)
+        self._copy_default_folder()
+        self._set_authmode_and_default_region()
 
+    def set_region(self, region):
+        self.region = region
+        if 'configurations' not in self.json_conf:
+            self.json_conf['configurations'] = {}
 
-    def _init_confs(self):
-        if 'regions' not in self.file_conf:
-            self.file_conf['regions'] = {}
-
-        if self.region not in self.file_conf['regions']:
-            self.file_conf['regions'][self.region] = {}
+        if self.region not in self.json_conf['configurations']:
+            self.json_conf['configurations'][self.region] = {}
 
         confs = self.cli.keys()
         # plural issue
@@ -31,84 +35,66 @@ class Conf:
         confs.append("proxie")
         for c in confs:
             c = c + "s"
-            if c not in self.file_conf['regions'][self.region]:
-                self.file_conf['regions'][self.region][c] = {}
-            setattr(self, c, self.file_conf['regions'][self.region][c])
-
-    def get_boto3(self, api_type):
-        if self.auth_mode == "env":
-            return boto3.client(
-                api_type,
-                aws_access_key_id=self.access_key,
-                aws_secret_access_key=self.secret_key,
-                region_name=self.region
-            )
-        else:
-            return boto3.client(api_type, region_name=self.region)
-
-    def get_boto3_r(self, api_type):
-        if self.auth_mode == "env":
-            return boto3.resource(
-                api_type,
-                aws_access_key_id=self.access_key,
-                aws_secret_access_key=self.secret_key,
-                region_name=self.region
-            )
-        else:
-            return boto3.resource(api_type, region_name=self.region)
+            if c not in self.json_conf['configurations'][self.region]:
+                self.json_conf['configurations'][self.region][c] = {}
+            setattr(self, c, self.json_conf['configurations'][self.region][c])
 
     def save_config(self):
-        f = open(self.config_file, "w")
-        f.write(json.dumps(self.file_conf, indent=4))
-        f.close()
+        with open(self.config_file, "w") as f:
+            f.write(json.dumps(self.json_conf, indent=4))
 
-    def read_config(self):
-        self.file_conf = None
-        if os.path.isfile(self.config_file):
-            f = open(self.config_file, "r")
-            self.file_conf = json.loads(f.read())
-            f.close()
+    def get_boto3(self, api_name, api_method):
+        func = getattr(__import__("boto3"), api_method)
+        if self.auth_mode == "env":
+            return func(
+                api_name,
+                aws_access_key_id=os.environ['AWS_ACCESS_KEY_ID'],
+                aws_secret_access_key=os.environ['AWS_SECRET_ACCESS_KEY'],
+                region_name=self.region
+            )
         else:
-            self.log.info("Creating a new config file: '" + self.config_file + "'")
-            f = open(self.config_file, "w")
-            self.file_conf = json.loads(pkgutil.get_data("lambda_toolkit", "data/lambda-toolkit.json"))
-            f.write(json.dumps(self.file_conf, indent=4))
-            f.close()
+            return func(api_name, region_name=self.region)
 
-        # Fill objects with conf data
-        ## Loads static configs from original ini to force updates without impact
-        self.cli = json.loads(pkgutil.get_data("lambda_toolkit", "data/lambda-toolkit.json"))['cli']
-        self.aws_regions = json.loads(pkgutil.get_data("lambda_toolkit", "data/lambda-toolkit.json"))['aws-regions']
-
-        self.sett = self.file_conf['settings']
-
-        # Create basic folders
-        self.data_dir = pkgutil.get_loader("lambda_toolkit").filename
-        self.base_dir = os.path.expanduser(self.sett['C_BASE_DIR'])
-
-        list_dir = ["LAMBDAS_DIR", "INVOKE_DIR", "INVOKE_DIR_EVT", "INVOKE_DIR_CTX"]
-
-        for d in list_dir:
-            setattr(self, d.lower(), os.path.join(self.base_dir, self.sett["C_" + d]))
-
-        if not os.path.exists(self.base_dir):
-            print("Creating")
-            copytree(os.path.join(self.data_dir, self.sett['C_STANDARD_FOLDER_DIR']), self.base_dir)
-
-        # Regional Config
+    def _set_authmode_and_default_region(self):
         self.auth_mode = "env"
         for env_var in ['AWS_REGION', 'AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY']:
             if env_var not in os.environ:
                 self.auth_mode = "file"
+                s = boto3.session.Session().region_name
+                if s is None:
+                    self.log.critical("Cannot read 'region' from env or credential file")
+                self.set_region(boto3.session.Session().region_name)
+                break
 
         if self.auth_mode == "env":
-            self.region = os.environ['AWS_REGION']
-            self.access_key = os.environ['AWS_ACCESS_KEY_ID']
-            self.secret_key = os.environ['AWS_SECRET_ACCESS_KEY']
+            self.set_region(os.environ['AWS_REGION'])
+
+
+    def _copy_default_folder(self):
+        if not os.path.exists(os.path.expanduser(self.sett['C_BASE_DIR'])):
+            copytree(os.path.join(pkgutil.get_loader("lambda_toolkit").filename,
+                                  self.sett['C_STANDARD_FOLDER_DIR']),
+                     os.path.expanduser(self.sett['C_BASE_DIR']))
+
+    def _sync_settings(self, default_conf):
+        if os.path.isfile(self.config_file):
+            with open(self.config_file, "r") as f:
+                self.json_conf = json.loads(f.read())
+                # Check for new settings (Make compatible with older versions)
+                for setting in default_conf['settings']:
+                    if setting not in self.json_conf['settings']:
+                        self.log.debug("Adding new setting: " + setting)
+                        self.json_conf['settings'][setting] = default_conf['settings'][setting]
+                # Remove deprecated settings
+                remove_list = []
+                for setting in self.json_conf['settings']:
+                    if setting not in default_conf['settings']:
+                        self.log.debug("Removing old setting: " + setting)
+                        remove_list.append(setting)
+                for r in remove_list:
+                    self.json_conf['settings'].pop(r)
         else:
-            self.region = boto3.session.Session().region_name
+            self.json_conf = {}
+            self.json_conf['settings'] = default_conf['settings']
 
-        if self.region is None:
-            self.log.critical("Cannot read 'region' from env or credential file")
-
-        self._init_confs()
+        return self.json_conf['settings']

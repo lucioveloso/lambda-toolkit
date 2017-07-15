@@ -7,7 +7,7 @@ import logger
 # TODO _ Maybe it can be another queue-toolkit
 class Queue:
     def __init__(self, conf, kwargs):
-        self.sqs = conf.get_boto3("sqs")
+        self.sqs = conf.get_boto3("sqs", "client")
         self.log = logger.get_my_logger(self.__class__.__name__)
         self.conf = conf
         self.queues = self.conf.queues.keys()

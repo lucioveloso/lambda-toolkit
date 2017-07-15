@@ -43,7 +43,7 @@ def queue(**kwargs):
 @click.option('--proxyname', '-p', help="Define the proxy name.")
 @click.option('--sqsname', '-q', callback=Utils.click_append_fifo_in_queue, help="Define the queue name.",
               type=click.Choice(Utils.click_list_queues_without_fifo(conf)))
-@click.option('--rolename', '-r', default=Utils.get_default_role(conf), callback=Utils.click_verify_role_exists,
+@click.option('--rolename', '-r', default=conf.sett['C_DEFAULT_ROLE'], callback=Utils.click_verify_role_exists,
               help="Define the role or try to get the default.")
 @click.option('--runtime','-e', default="python2.7", help="Define runtime. (Default: Python2.7)",
               type=click.Choice(Utils.click_list_runtime()))
@@ -54,7 +54,7 @@ def proxy(**kwargs):
 @cli.command()
 @click.argument('action', required=True, type=click.Choice(Utils.click_get_command_choice("project", conf)))
 @click.option( '--projectname', '-p', help="Define the project.")
-@click.option('--rolename', '-r', default=Utils.get_default_role(conf), callback=Utils.click_verify_role_exists,
+@click.option('--rolename', '-r', default=conf.sett['C_DEFAULT_ROLE'], callback=Utils.click_verify_role_exists,
               help="Define the role or try to get the default.")
 @click.option('--runtime','-e', default="python2.7", help="Define runtime. (Default: Python2.7)",
               type=click.Choice(Utils.click_list_runtime()))
@@ -105,7 +105,7 @@ def list(**kwargs):
         args = {}
         args['action'] = "list"
         clazz = getattr(getattr(myclass.modules, m), m.title())
-        getattr(clazz(conf, args), args['action'].replace("-", "_") + "_" + m)()
+        getattr(clazz(conf, args), args['action'].replace("-", "_") + "_" + m)().save_config()
 
 
 print("Initializing lambda-toolkit CLI (v" + __version__ + ") - Region: " + conf.region + " - Auth: " + conf.auth_mode)
