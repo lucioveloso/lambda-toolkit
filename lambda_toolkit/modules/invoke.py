@@ -1,19 +1,15 @@
 #!/usr/bin/env python
 
 import os
-import pkgutil
 import sys
 import json
-import boto3
-import logger
 import base64
-from lambdacontext import LambdaContext
-
+from lambda_toolkit.modules.lambdacontext import LambdaContext
 
 class Invoke:
     def __init__(self, conf, kwargs):
         self.lbs = conf.get_boto3("lambda", "client")
-        self.log = logger.get_my_logger(self.__class__.__name__)
+        self.log = conf.log
         self.conf = conf
         self.kwargs = kwargs
 
@@ -55,10 +51,10 @@ class Invoke:
             InvocationType='RequestResponse',
             Payload=open(os.path.join(os.path.expanduser(self.conf.sett['C_BASE_DIR']),
                                       self.conf.sett['C_INVOKE_DIR_EVT'],
-                                      self.kwargs['event_file']))
+                                      self.kwargs['event_file'])).read()
         )
 
-        print base64.b64decode(ret['LogResult'])
+        print(base64.b64decode(ret['LogResult']).decode())
 
         return self.conf
 

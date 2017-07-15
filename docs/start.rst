@@ -10,31 +10,26 @@ General Prerequisites
 
 Basically, to start to use the lambda-toolkit, you must have at least:
 
-* Python 2.7
+* Python 2 or 3
 * Package Management System (``pip``)
 * AWS Credentials
 
-Python 2.7
+Python
 ==========
 
-Python 2.7 is required to use lambda-toolkit. By this way, you should make sure that your system has a proper Python 2.7 installation available::
+Python is required to use lambda-toolkit. By this way, you should make sure that your system has a proper Python installation available::
 
     $ python --version
-    Python 2.7.x
+    Python x.x.x
 
-or::
+If your system does not support Python, you can install `here <python_>`_.
 
-    $ python2.7 --version
-    Python 2.7.x
-
-If your system does not support Python 2.7, you can install `here <python27_>`_.
-
-.. _python27: https://www.python.org/download/releases/2.7/
+.. _python: https://www.python.org/download
 
 Package Management System (pip)
 ===============================
 
-pip is required to use lambda-toolkit. By this way, you should make sure that your system has a proper pip (compatible with Python 2.7) installed::
+pip is required to use lambda-toolkit. By this way, you should make sure that your system has a proper pip installed::
 
    $ pip --version
    pip 9.0.1 from /Library/Python/2.7/site-packages/pip-9.0.1-py2.7.egg (python 2.7)

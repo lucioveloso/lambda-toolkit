@@ -1,4 +1,4 @@
-import json
+
 
 class LambdaContext:
     def __init__(self, context_json):

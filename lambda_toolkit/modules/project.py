@@ -2,13 +2,12 @@
 
 import os
 import pkgutil
-from utils import Utils
+from lambda_toolkit.modules.utils import Utils
 from shutil import make_archive
 from shutil import rmtree
-from urllib import urlretrieve
 from zipfile import ZipFile
+import sys
 import time
-
 
 class Project:
     def __init__(self, conf, kwargs):
@@ -43,7 +42,7 @@ class Project:
         return self.conf
 
     def deploy_all_project(self):
-        for s in self.projects:
+        for s in list(self.projects):
             self._set_project(s)
             self.deploy_project()
 
@@ -51,7 +50,7 @@ class Project:
         return self.conf
 
     def undeploy_all_project(self):
-        for s in self.projects:
+        for s in list(self.projects):
             self._set_project(s)
             self.undeploy_project()
 
@@ -66,10 +65,10 @@ class Project:
 
             if 'python' in self.kwargs['runtime']:
                 open(self.project_dir + "/__init__.py", 'a').close()
-                with open(os.path.join(self.project_dir, "index.py"), "w") as text_file:
+                with open(os.path.join(self.project_dir, "index.py"), "wb") as text_file:
                     text_file.write(pkgutil.get_data("lambda_toolkit", self.conf.sett['C_LAMBDASTANDARD_FUNC_PY']))
             elif 'nodejs' in self.kwargs['runtime']:
-                with open(os.path.join(self.project_dir, "index.js"), "w") as text_file:
+                with open(os.path.join(self.project_dir, "index.js"), "wb") as text_file:
                     text_file.write(pkgutil.get_data("lambda_toolkit", self.conf.sett['C_LAMBDASTANDARD_FUNC_JS']))
 
             self.log.info("Project '" + self.projectname + "' "
@@ -81,7 +80,7 @@ class Project:
         return self.conf
 
     def delete_all_project(self):
-        for s in self.projects:
+        for s in list(self.projects):
             self._set_project(s)
             self.delete_project()
 
@@ -120,11 +119,18 @@ class Project:
                 self.conf.projects[self.projectname]['runtime'] = lambda_function['Configuration']['Runtime']
                 self.log.info("Project " + self.projectname + " imported.")
 
-            urlretrieve(lambda_function['Code']['Location'], self.project_zip_file)
-            zip_ref = ZipFile(self.project_zip_file, 'r')
-            zip_ref.extractall(self.project_dir)
-            zip_ref.close()
+            import requests, zipfile
+            if sys.version_info[0] == 3:
+                import io
+                r = requests.get(lambda_function['Code']['Location'], stream=True)
+                z = zipfile.ZipFile(io.BytesIO(r.content))
+            else:
+                import StringIO
+                r = requests.get(lambda_function['Code']['Location'], stream=True)
+                z = zipfile.ZipFile(StringIO.StringIO(r.content))
 
+            z.extractall(self.project_dir)
+            z.close()
         except Exception as e:
             self.log.error(str(e))
             self.log.warn("The project '" + self.projectname + "' does not exist in AWS environment.")

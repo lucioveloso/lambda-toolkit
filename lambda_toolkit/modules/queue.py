@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
-from utils import Utils
-import logger
+from lambda_toolkit.modules.utils import Utils
 
 
 class Queue:
@@ -53,7 +52,7 @@ class Queue:
         return self.conf
 
     def delete_all_queue(self):
-        for q in self.queues:
+        for q in list(self.queues):
             self.sqsname = q
             self.delete_queue()
 

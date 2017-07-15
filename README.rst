@@ -10,6 +10,11 @@ lambda-toolkit
    :target: https://travis-ci.org/lucioveloso/lambda-toolkit
    :alt: Build Status
 
+.. image:: https://img.shields.io/pypi/pyversions/lambda-toolkit.svg
+   :alt: Compatible
+
+* Now compatible with Python 2 and 3.
+
 Easy to use and install
 ------------------------
 
@@ -28,6 +33,11 @@ GitHub Project
 --------------
   https://github.com/lucioveloso/lambda-toolkit
 
+=====================================
+Installation::
+=====================================
+
+    $ pip install lambda-toolkit -U
 
 =====================================
 Lambda-toolkit offers a lambda proxy
@@ -49,8 +59,3 @@ Lambda-toolkit offers lambda tailing
 
 .. image:: https://s3-eu-west-1.amazonaws.com/lucio-public-bucket/lambda-tail.gif
 
-==============================
-Get started NOW!
-==============================
-
-Access our documentation, and set up it now.
