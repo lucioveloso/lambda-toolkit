@@ -4,7 +4,7 @@ import json
 import os
 import sys
 import signal
-
+from lambda_toolkit.modules.utils import  Utils
 from lambda_toolkit.modules.lambdacontext import LambdaContext
 
 def signal_handler(signal, frame):
@@ -24,7 +24,8 @@ class Receiver:
 
         queue = self.sqs.get_queue_by_name(QueueName=self.sqsname)
         self.log.info("Importing project " + self.projectname)
-        pp = os.path.join(os.path.expanduser(self.conf.sett['C_BASE_DIR']), self.conf.sett['C_LAMBDAS_DIR'],
+        pp = os.path.join(Utils.fixpath(self.conf.sett['C_BASE_DIR']),
+                          Utils.fixpath(self.conf.sett['C_LAMBDAS_DIR']),
                           self.conf.region, self.projectname)
         self.log.debug("Using project dir: " + pp)
         sys.path.append(pp)

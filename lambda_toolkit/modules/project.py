@@ -289,13 +289,13 @@ class Project:
         if projectname in self.conf.proxies.keys():
             self.log.critical("You cannot act in a project with the same name of an existing proxy.")
         self.projectname = projectname
-        self.project_dir = os.path.join(os.path.expanduser(self.conf.sett['C_BASE_DIR']),
-                                        self.conf.sett['C_LAMBDAS_DIR'],
+        self.project_dir = os.path.join(Utils.fixpath(self.conf.sett['C_BASE_DIR']),
+                                        Utils.fixpath(self.conf.sett['C_LAMBDAS_DIR']),
                                         self.conf.region, projectname)
-        self.project_zip_dir = os.path.join(os.path.expanduser(self.conf.sett['C_BASE_DIR']),
-                                            self.conf.sett['C_LAMBDAS_DIR'],
+        self.project_zip_dir = os.path.join(Utils.fixpath(self.conf.sett['C_BASE_DIR']),
+                                            Utils.fixpath(self.conf.sett['C_LAMBDAS_DIR']),
                                             self.conf.region,
-                                            self.conf.sett['C_LAMBDAS_ZIP_DIR'])
+                                            Utils.fixpath(self.conf.sett['C_LAMBDAS_ZIP_DIR']))
         self.project_zip_file = os.path.join(self.project_zip_dir, projectname + ".zip")
         self.project_zip_file_without_ext = os.path.join(self.project_zip_dir, projectname)
 

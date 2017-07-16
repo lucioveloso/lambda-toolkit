@@ -122,12 +122,12 @@ class Proxy:
             self.log.critical("You cannot create a proxy with the same name of an existing project.")
 
         self.proxyname = proxyname
-        self.lambdaproxy_dir = os.path.join(os.path.expanduser(self.conf.sett['C_BASE_DIR']),
-                                            self.conf.sett['C_LAMBDAS_DIR'],
+        self.lambdaproxy_dir = os.path.join(Utils.fixpath(self.conf.sett['C_BASE_DIR']),
+                                            Utils.fixpath(self.conf.sett['C_LAMBDAS_DIR']),
                                             self.conf.region,
                                             proxyname)
-        self.lambdaproxy_zip_dir = os.path.join(os.path.expanduser(self.conf.sett['C_BASE_DIR']),
-                                                self.conf.sett['C_LAMBDAS_DIR'],
+        self.lambdaproxy_zip_dir = os.path.join(Utils.fixpath(self.conf.sett['C_BASE_DIR']),
+                                                Utils.fixpath(self.conf.sett['C_LAMBDAS_DIR']),
                                                 self.conf.region,
-                                                self.conf.sett['C_LAMBDAS_ZIP_DIR'])
+                                                Utils.fixpath(self.conf.sett['C_LAMBDAS_ZIP_DIR']))
         self.lambdaproxy_zip_file = os.path.join(self.lambdaproxy_zip_dir, proxyname + ".zip")
