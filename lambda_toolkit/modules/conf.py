@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import lambda_toolkit.modules.logger as logger
+from lambda_toolkit.modules.utils import Utils
 import os
 import json
 import pkgutil
@@ -73,10 +74,11 @@ class Conf:
 
 
     def _copy_default_folder(self):
-        if not os.path.exists(os.path.expanduser(self.sett['C_BASE_DIR'])):
-            copytree(os.path.join("lambda_toolkit",
-                                  self.sett['C_STANDARD_FOLDER_DIR']),
-                     os.path.expanduser(self.sett['C_BASE_DIR']))
+        if not os.path.exists(Utils.fixpath(self.sett['C_BASE_DIR'])):
+            path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            if not os.path.exists(Utils.fixpath(self.sett['C_BASE_DIR'])):
+                copytree(os.path.join(path, Utils.fixpath(self.sett['C_STANDARD_FOLDER_DIR'])),
+                         Utils.fixpath(self.sett['C_BASE_DIR']))
 
     def _sync_settings(self, default_conf):
         if os.path.isfile(self.config_file):

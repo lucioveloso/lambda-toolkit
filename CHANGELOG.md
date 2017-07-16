@@ -1,6 +1,7 @@
 #### Version 0.3
 
 * Compatible with Python 2 and 3.
+* Compatible with Windows.
 * Major bugs fixed
 * Multi region support improved
 

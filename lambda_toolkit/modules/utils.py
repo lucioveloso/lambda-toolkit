@@ -13,6 +13,13 @@ class Utils:
         pass
 
     @staticmethod
+    def fixpath(path):
+        path = os.path.normpath(os.path.expanduser(path))
+        if path.startswith("\\"):
+            return "C:" + path
+        return path
+
+    @staticmethod
     def docstring_parameter(*sub):
         def dec(obj):
             obj.__doc__ = pkgutil.get_data("lambda_toolkit", os.path.join(sub[0].sett['C_HELPS_FILES'], obj.__name__ + ".txt"))

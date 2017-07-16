@@ -14,6 +14,7 @@ lambda-toolkit
    :alt: Compatible
 
 * Now compatible with Python 2 and 3.
+* Now compatible with Linux, Mac and Windows.
 
 Easy to use and install
 ------------------------
