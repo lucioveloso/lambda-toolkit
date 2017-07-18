@@ -6,3 +6,4 @@ boto3>=1.4.4
 tail-toolkit>=0.0.7
 click>=6.7
 sphinx>=1.6.3
+requests>=2.18.1
