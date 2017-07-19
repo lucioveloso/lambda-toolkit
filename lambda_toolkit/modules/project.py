@@ -157,6 +157,11 @@ class Project:
                 )
                 self.log.info("Lambda project " + self.projectname + " was redeployed.")
             else:
+                if 'rolename' not in self.kwargs:
+                    self.log.warn("Project '" + self.project +
+                                  "' is new. The parameter --rolename is required. Skipping.")
+                    return self.conf
+
                 self.conf.get_boto3("lambda", "client").create_function(
                     FunctionName=self.projectname,
                     Runtime=self.conf.projects[self.projectname]['runtime'],
@@ -175,7 +180,6 @@ class Project:
             self.log.error(str(e))
             self.log.critical("Failed to deploy the lambda project.")
 
-        #os.remove(self.project_zip_file)
         return self.conf
 
     def undeploy_project(self):
