@@ -26,12 +26,19 @@ class Invoke:
 
             self.log.debug("Using project dir: " + pp)
             sys.path.append(pp)
-            func = getattr(__import__("index"), "lambda_handler")
+
+
+            vars = self.conf.projects[self.kwargs['projectname']]['variables']
+
+            for v in vars:
+                self.log.info("Injecting lambda variable '" + v + "' with value '" + vars[v] + "'.")
+                os.environ[v] = vars[v]
 
             ctx = LambdaContext(json.loads(open(os.path.join(os.path.expanduser(self.conf.sett['C_BASE_DIR']),
                                                              self.conf.sett['C_INVOKE_DIR_CTX'],
                                                              self.conf.sett['C_INVOKE_CTX_FILE'])).read()))
 
+            func = getattr(__import__("index"), "lambda_handler")
             func(self._get_event(), ctx)
 
         return self.conf

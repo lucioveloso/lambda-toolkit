@@ -1,3 +1,9 @@
+#### Version 0.3.3
+
+* Add support to set/unset variables to lambda projects
+* Importing and deploying variables
+* Using variables when lambda is invoking local and on receiver
+
 #### Version 0.3
 
 * Compatible with Python 2 and 3.

@@ -53,7 +53,9 @@
             "import-all-regions": [],
             "delete-all-regions": [],
             "undeploy-all-regions": [],
-            "deploy-all-regions": [ "rolename" ]
+            "deploy-all-regions": [ "rolename" ],
+            "set-variable": [ "projectname", "variable", "value" ],
+            "unset-variable": [ "projectname", "variable" ]
           }
         }
     },
