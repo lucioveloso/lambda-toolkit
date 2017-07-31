@@ -67,10 +67,7 @@ class Proxy:
             index_file = "index.js"
 
         f2 = open(os.path.join(self.lambdaproxy_dir, index_file), "w")
-        for line in f1.splitlines():
-            a = str(line.decode()).replace(self.conf.sett['C_LAMBDASTANDERD_FUNC_VAR_REPLACE'], self.kwargs['sqsname'])
-            f2.write(a)
-            f2.write("\n")
+        f2.write(f1)
         f2.close()
 
         make_archive(os.path.splitext(self.lambdaproxy_zip_file)[0], "zip", self.lambdaproxy_dir)
@@ -85,6 +82,11 @@ class Proxy:
                     'sqsname'],
                 Code={
                     'ZipFile': open(self.lambdaproxy_zip_file, "rb").read()
+                },
+                Environment={
+                    'Variables': {
+                        'sqsname': self.kwargs['sqsname'],
+                    }
                 }
             )
             self.log.info("Lambda proxy " + self.proxyname + " created proxying requests to " + self.kwargs['sqsname'])

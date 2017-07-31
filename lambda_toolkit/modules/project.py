@@ -5,9 +5,9 @@ import pkgutil
 from lambda_toolkit.modules.utils import Utils
 from shutil import make_archive
 from shutil import rmtree
-from zipfile import ZipFile
 import sys
 import time
+import json
 
 class Project:
     def __init__(self, conf, kwargs):
@@ -110,14 +110,19 @@ class Project:
 
             if self.projectname in self.conf.projects:
                 self.log.info("Project '" + self.projectname + "' already exists in your configuration. Updating.")
-                self.conf.projects[self.projectname]['deployed'] = True
             else:
                 self._create_project_folders()
                 open(self.project_dir + "/__init__.py", 'a').close()
                 self.conf.projects[self.projectname] = {}
-                self.conf.projects[self.projectname]['deployed'] = True
-                self.conf.projects[self.projectname]['runtime'] = lambda_function['Configuration']['Runtime']
                 self.log.info("Project " + self.projectname + " imported.")
+
+            self.conf.projects[self.projectname]['deployed'] = True
+            self.conf.projects[self.projectname]['runtime'] = lambda_function['Configuration']['Runtime']
+            self.conf.projects[self.projectname]['variables'] = {}
+            vars = lambda_function['Configuration']['Environment']['Variables']
+            for v in vars:
+                self.log.info("Importing lambda variable '" + v + "' with value '" + vars[v] + "'.")
+                self.conf.projects[self.projectname]['variables'][v] = vars[v]
 
             import requests, zipfile
             if sys.version_info[0] == 3:
@@ -150,10 +155,11 @@ class Project:
             replace = False
 
         try:
+
             if replace:
                 self.conf.get_boto3("lambda", "client").update_function_code(
                     FunctionName=self.projectname,
-                    ZipFile=open(self.project_zip_file, "rb").read()
+                    ZipFile=open(self.project_zip_file, "rb").read(),
                 )
                 self.log.info("Lambda project " + self.projectname + " was redeployed.")
             else:
@@ -164,15 +170,23 @@ class Project:
 
                 self.conf.get_boto3("lambda", "client").create_function(
                     FunctionName=self.projectname,
-                    Runtime=self.conf.projects[self.projectname]['runtime'],
+                    Runtime=self.kwargs['runtime'],
                     Role=self.kwargs['rolename'],
                     Handler='index.lambda_handler',
                     Description="Lambda project " + self.projectname + " deployed by lambda-proxy",
                     Code={
                         'ZipFile': open(self.project_zip_file, "rb").read()
-                    }
+                    },
                 )
+
                 self.log.info("Lambda project " + self.projectname + " was created and deployed.")
+
+            self.conf.get_boto3("lambda", "client").update_function_configuration(
+                FunctionName=self.projectname,
+                Environment={
+                    'Variables': self.conf.projects[self.projectname]['variables']
+                }
+            )
 
             self.conf.projects[self.projectname]['deployed'] = True
 
@@ -196,7 +210,21 @@ class Project:
 
         return self.conf
 
+    def set_variable_project(self):
+        if self.projectname in self.conf.projects:
+            self.conf.projects[self.projectname]['variables'][self.kwargs['variable']] = self.kwargs['value']
+            self.log.info("Variable " + self.kwargs['variable'] + " now is: " + self.kwargs['value'])
+            return self.conf
 
+        self.log.warn("Project does not exist")
+
+    def unset_variable_project(self):
+        if self.projectname in self.conf.projects:
+            self.conf.projects[self.projectname]['variables'].pop(self.kwargs['variable'])
+            self.log.info("Variable " + self.kwargs['variable'] + " has been removed.")
+            return self.conf
+
+        self.log.warn("Project does not exist")
     def delete_all_regions_project(self):
         for reg in self.conf.aws_regions:
             self._update_new_region(reg)

@@ -60,6 +60,8 @@ def proxy(**kwargs):
 @click.option('--runtime','-e', default="python2.7", help="Define runtime. (Default: Python2.7)",
               type=click.Choice(Utils.click_list_runtime()))
 @click.option('--region', '-R', type=click.Choice(conf.aws_regions), help="Define the optional region.")
+@click.option( '--value', '-V', help="Define the a value to a variable")
+@click.option( '--variable', '-v', help="Define the a variable name")
 @Utils.docstring_parameter(conf)
 def project(**kwargs):
     execute_cli(kwargs)
