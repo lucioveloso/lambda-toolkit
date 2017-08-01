@@ -33,11 +33,13 @@ class Receiver:
         func = getattr(a, "lambda_handler")
 
         self.log.info("Starting the receiver using the queue " + self.sqsname)
-        lambda_vars = self.conf.projects[self.kwargs['projectname']]['variables']
 
-        for v in lambda_vars:
-            self.log.info("Injecting lambda variable '" + v + "' with value '" + lambda_vars[v] + "'.")
-            os.environ[v] = lambda_vars[v]
+        if 'variables' in self.conf.projects[self.projectname]:
+            vars = self.conf.projects[self.projectname]['variables']
+
+            for v in vars:
+                self.log.info("Injecting lambda variable '" + v + "' with value '" + vars[v] + "'.")
+                os.environ[v] = vars[v]
 
         while True:
             try:

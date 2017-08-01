@@ -119,10 +119,12 @@ class Project:
             self.conf.projects[self.projectname]['deployed'] = True
             self.conf.projects[self.projectname]['runtime'] = lambda_function['Configuration']['Runtime']
             self.conf.projects[self.projectname]['variables'] = {}
-            vars = lambda_function['Configuration']['Environment']['Variables']
-            for v in vars:
-                self.log.info("Importing lambda variable '" + v + "' with value '" + vars[v] + "'.")
-                self.conf.projects[self.projectname]['variables'][v] = vars[v]
+            if 'Environment' in lambda_function['Configuration']:
+                if 'Variables' in lambda_function['Configuration']['Environment']:
+                    vars = lambda_function['Configuration']['Environment']['Variables']
+                    for v in vars:
+                        self.log.info("Importing lambda variable '" + v + "' with value '" + vars[v] + "'.")
+                        self.conf.projects[self.projectname]['variables'][v] = vars[v]
 
             import requests, zipfile
             if sys.version_info[0] == 3:
@@ -179,14 +181,13 @@ class Project:
                     },
                 )
 
-                self.log.info("Lambda project " + self.projectname + " was created and deployed.")
-
-            self.conf.get_boto3("lambda", "client").update_function_configuration(
-                FunctionName=self.projectname,
-                Environment={
-                    'Variables': self.conf.projects[self.projectname]['variables']
-                }
-            )
+            if 'variables' in self.conf.projects[self.projectname]:
+                self.conf.get_boto3("lambda", "client").update_function_configuration(
+                    FunctionName=self.projectname,
+                    Environment={
+                        'Variables': self.conf.projects[self.projectname]['variables']
+                    }
+                )
 
             self.conf.projects[self.projectname]['deployed'] = True
 

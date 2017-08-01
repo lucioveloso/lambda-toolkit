@@ -16,6 +16,13 @@ lambda-toolkit
 * Now compatible with Python 2 and 3.
 * Now compatible with Linux, Mac and Windows.
 
+Top Features
+------------
+
+* Invoke locally lambdas in your machine with simulated events or real events
+* Easy import and deploy your lambdas in different regions (v0.3.0)
+* Supporting Lambda Environment Variables (Even in local execution) (v0.3.3)
+
 Easy to use and install
 ------------------------
 

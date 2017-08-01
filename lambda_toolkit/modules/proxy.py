@@ -67,7 +67,7 @@ class Proxy:
             index_file = "index.js"
 
         f2 = open(os.path.join(self.lambdaproxy_dir, index_file), "w")
-        f2.write(f1)
+        f2.write(str(f1))
         f2.close()
 
         make_archive(os.path.splitext(self.lambdaproxy_zip_file)[0], "zip", self.lambdaproxy_dir)
