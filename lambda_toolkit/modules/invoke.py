@@ -27,12 +27,12 @@ class Invoke:
             self.log.debug("Using project dir: " + pp)
             sys.path.append(pp)
 
+            if 'variables' in self.conf.projects[self.kwargs['projectname']]:
+                vars = self.conf.projects[self.kwargs['projectname']]['variables']
 
-            vars = self.conf.projects[self.kwargs['projectname']]['variables']
-
-            for v in vars:
-                self.log.info("Injecting lambda variable '" + v + "' with value '" + vars[v] + "'.")
-                os.environ[v] = vars[v]
+                for v in vars:
+                    self.log.info("Injecting lambda variable '" + v + "' with value '" + vars[v] + "'.")
+                    os.environ[v] = vars[v]
 
             ctx = LambdaContext(json.loads(open(os.path.join(os.path.expanduser(self.conf.sett['C_BASE_DIR']),
                                                              self.conf.sett['C_INVOKE_DIR_CTX'],
