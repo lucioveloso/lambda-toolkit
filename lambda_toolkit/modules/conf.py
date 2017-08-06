@@ -18,7 +18,10 @@ class Conf:
         default_conf = json.loads(pkgutil.get_data("lambda_toolkit", "data/lambda-toolkit.json"))
         self.cli = default_conf['cli']
         self.aws_regions = default_conf['aws-regions']
+
+        # Keep compatibility with previous versions
         self.sett = self._sync_settings(default_conf)
+
         self._copy_default_folder()
         self._set_authmode_and_default_region()
 

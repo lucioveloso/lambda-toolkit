@@ -73,7 +73,6 @@ class Project:
 
             self.log.info("Project '" + self.projectname + "' "
                           "[" + self.kwargs['runtime'] + "] has been created.")
-            self.conf.projects[self.projectname] = {}
             self.conf.projects[self.projectname]['deployed'] = False
             self.conf.projects[self.projectname]['runtime'] = self.kwargs['runtime']
 
@@ -113,12 +112,10 @@ class Project:
             else:
                 self._create_project_folders()
                 open(self.project_dir + "/__init__.py", 'a').close()
-                self.conf.projects[self.projectname] = {}
                 self.log.info("Project " + self.projectname + " imported.")
 
             self.conf.projects[self.projectname]['deployed'] = True
             self.conf.projects[self.projectname]['runtime'] = lambda_function['Configuration']['Runtime']
-            self.conf.projects[self.projectname]['variables'] = {}
             if 'Environment' in lambda_function['Configuration']:
                 if 'Variables' in lambda_function['Configuration']['Environment']:
                     vars = lambda_function['Configuration']['Environment']['Variables']
@@ -210,6 +207,17 @@ class Project:
         self.conf.projects[self.projectname]['deployed'] = False
 
         return self.conf
+
+    def list_variables_project(self):
+        if self.projectname in self.conf.projects:
+            vars = self.conf.projects[self.projectname]['variables']
+            self.log.info("Lambda environment variables:")
+            for var in vars:
+                self.log.info("Variable: " + var + " Value: " + vars[var])
+
+            return self.conf
+
+        self.log.warn("Project does not exist")
 
     def set_variable_project(self):
         if self.projectname in self.conf.projects:
@@ -322,6 +330,13 @@ class Project:
         if projectname in self.conf.proxies.keys():
             self.log.critical("You cannot act in a project with the same name of an existing proxy.")
         self.projectname = projectname
+        if self.projectname not in self.conf.projects:
+            self.conf.projects[self.projectname] = {}
+
+        if 'variables' not in self.conf.projects[self.projectname]:
+            self.log.debug("Creating project variable")
+            self.conf.projects[self.projectname]['variables'] = {}
+
         self.project_dir = os.path.join(Utils.fixpath(self.conf.sett['C_BASE_DIR']),
                                         Utils.fixpath(self.conf.sett['C_LAMBDAS_DIR']),
                                         self.conf.region, projectname)

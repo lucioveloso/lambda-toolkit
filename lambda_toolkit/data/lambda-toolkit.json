@@ -55,7 +55,8 @@
             "undeploy-all-regions": [],
             "deploy-all-regions": [ "rolename" ],
             "set-variable": [ "projectname", "variable", "value" ],
-            "unset-variable": [ "projectname", "variable" ]
+            "unset-variable": [ "projectname", "variable" ],
+            "list-variables": [ "projectname" ]
           }
         }
     },

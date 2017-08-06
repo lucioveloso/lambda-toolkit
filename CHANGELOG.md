@@ -1,3 +1,7 @@
+#### Version 0.3.4
+
+* Added project command: list-variables
+
 #### Version 0.3.3
 
 * Add support to set/unset variables to lambda projects
