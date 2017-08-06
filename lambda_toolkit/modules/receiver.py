@@ -69,5 +69,4 @@ class Receiver:
                     self.log.info("=======================================")
 
             except Exception as a:
-                print("OI")
                 print(a)
