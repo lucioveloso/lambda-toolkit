@@ -23,6 +23,11 @@ Top Features
 * Easy import and deploy your lambdas in different regions (v0.3.0)
 * Supporting Lambda Environment Variables (Even in local execution) (v0.3.3)
 
+Contributing
+------------
+
+We are open to contributions. Also let we know if you need some feature that is not implemented or it's not working properly. Please feel free to open an Issue in the Github project requesting fixes or new features.
+
 Easy to use and install
 ------------------------
 
@@ -41,9 +46,8 @@ GitHub Project
 --------------
   https://github.com/lucioveloso/lambda-toolkit
 
-=====================================
-Installation::
-=====================================
+Installation:
+-------------
 
     $ pip install lambda-toolkit -U
 
