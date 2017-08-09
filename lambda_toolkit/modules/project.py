@@ -19,10 +19,10 @@ class Project:
         else:
             self.conf = conf
 
+
         if Utils.check_kwargs(kwargs, "projectname"):
             self.projectname = kwargs['projectname']
-            if kwargs['action'] != "create":
-                self._set_project(self.projectname)
+            self._set_project(self.projectname)
 
         self.kwargs = kwargs
         self.projects = self.conf.projects.keys()
@@ -61,28 +61,29 @@ class Project:
     def create_project(self):
         if self.projectname in self.conf.projects:
             self.log.warn("Project '" + self.projectname + "' already exists in lambda-toolkit.")
-        else:
-            self._set_project(self.projectname)
-            self._create_project_folders()
+            exit(1)
+        self.conf.projects[self.projectname] = {}
+        self.conf.projects[self.projectname]['variables'] = {}
+        self._create_project_folders()
 
-            if 'python' in self.kwargs['runtime']:
-                open(self.project_dir + "/__init__.py", 'a').close()
-                with open(os.path.join(self.project_dir, "index.py"), "wb") as text_file:
-                    text_file.write(pkgutil.get_data("lambda_toolkit", self.conf.sett['C_LAMBDASTANDARD_FUNC_PY']))
-            elif 'nodejs' in self.kwargs['runtime']:
-                with open(os.path.join(self.project_dir, "index.js"), "wb") as text_file:
-                    text_file.write(pkgutil.get_data("lambda_toolkit", self.conf.sett['C_LAMBDASTANDARD_FUNC_JS']))
+        if 'python' in self.kwargs['runtime']:
+            open(self.project_dir + "/__init__.py", 'a').close()
+            with open(os.path.join(self.project_dir, "index.py"), "wb") as text_file:
+                text_file.write(pkgutil.get_data("lambda_toolkit", self.conf.sett['C_LAMBDASTANDARD_FUNC_PY']))
+        elif 'nodejs' in self.kwargs['runtime']:
+            with open(os.path.join(self.project_dir, "index.js"), "wb") as text_file:
+                text_file.write(pkgutil.get_data("lambda_toolkit", self.conf.sett['C_LAMBDASTANDARD_FUNC_JS']))
 
-            self.log.info("Project '" + self.projectname + "' "
-                          "[" + self.kwargs['runtime'] + "] has been created.")
-            self.conf.projects[self.projectname]['deployed'] = False
-            self.conf.projects[self.projectname]['runtime'] = self.kwargs['runtime']
+        self.log.info("Project '" + self.projectname + "' "
+                      "[" + self.kwargs['runtime'] + "] has been created.")
+        self.conf.projects[self.projectname]['deployed'] = False
+        self.conf.projects[self.projectname]['runtime'] = self.kwargs['runtime']
 
         return self.conf
 
     def delete_all_project(self):
         for s in list(self.projects):
-            self._set_project(s)
+            self.projectname = s
             self.delete_project()
 
         self.log.info("Deleted all projects in " + self.conf.region + ".")
@@ -112,6 +113,8 @@ class Project:
             if self.projectname in self.conf.projects:
                 self.log.info("Project '" + self.projectname + "' already exists in your configuration. Updating.")
             else:
+                self.conf.projects[self.projectname] = {}
+                self.conf.projects[self.projectname]['variables'] = {}
                 self._create_project_folders()
                 open(self.project_dir + "/__init__.py", 'a').close()
                 self.log.info("Project " + self.projectname + " imported.")
@@ -164,9 +167,9 @@ class Project:
                 )
                 self.log.info("Lambda project " + self.projectname + " was redeployed.")
             else:
-                if 'rolename' not in self.kwargs:
-                    self.log.warn("Project '" + self.project +
-                                  "' is new. The parameter --rolename is required. Skipping.")
+                if self.kwargs['rolename'] is None:
+                    self.log.error("Project '" + self.projectname + "' is new. The parameter --rolename is required.")
+                    exit(1)
                     return self.conf
 
                 self.conf.get_boto3("lambda", "client").create_function(
@@ -179,6 +182,7 @@ class Project:
                         'ZipFile': open(self.project_zip_file, "rb").read()
                     },
                 )
+                self.log.info("Lambda project " + self.projectname + " was deployed.")
 
             if 'variables' in self.conf.projects[self.projectname]:
                 self.conf.get_boto3("lambda", "client").update_function_configuration(
@@ -332,12 +336,6 @@ class Project:
         if projectname in self.conf.proxies.keys():
             self.log.critical("You cannot act in a project with the same name of an existing proxy.")
         self.projectname = projectname
-        if self.projectname not in self.conf.projects:
-            self.conf.projects[self.projectname] = {}
-
-        if 'variables' not in self.conf.projects[self.projectname]:
-            self.log.debug("Creating project variable")
-            self.conf.projects[self.projectname]['variables'] = {}
 
         self.project_dir = os.path.join(Utils.fixpath(self.conf.sett['C_BASE_DIR']),
                                         Utils.fixpath(self.conf.sett['C_LAMBDAS_DIR']),
