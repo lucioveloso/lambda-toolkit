@@ -21,7 +21,8 @@ class Project:
 
         if Utils.check_kwargs(kwargs, "projectname"):
             self.projectname = kwargs['projectname']
-            self._set_project(self.projectname)
+            if kwargs['action'] != "create":
+                self._set_project(self.projectname)
 
         self.kwargs = kwargs
         self.projects = self.conf.projects.keys()
@@ -61,6 +62,7 @@ class Project:
         if self.projectname in self.conf.projects:
             self.log.warn("Project '" + self.projectname + "' already exists in lambda-toolkit.")
         else:
+            self._set_project(self.projectname)
             self._create_project_folders()
 
             if 'python' in self.kwargs['runtime']:
