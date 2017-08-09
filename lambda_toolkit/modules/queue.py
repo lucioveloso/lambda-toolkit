@@ -55,7 +55,7 @@ class Queue:
         for q in list(self.queues):
             self.sqsname = q
             self.delete_queue()
-
+        self.log.info("Deleted all queues.")
         return self.conf
 
     def delete_queue(self):
