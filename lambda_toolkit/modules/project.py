@@ -83,7 +83,7 @@ class Project:
 
     def delete_all_project(self):
         for s in list(self.projects):
-            self.projectname = s
+            self._set_project(s)
             self.delete_project()
 
         self.log.info("Deleted all projects in " + self.conf.region + ".")
